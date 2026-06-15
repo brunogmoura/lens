@@ -82,6 +82,10 @@ svg { display: block; flex-shrink: 0; }
 .form-label { font-size: 0.68rem; font-weight: 600; color: var(--muted); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.06em; }
 .form-input { width: 100%; background: var(--s1); border: 1px solid var(--border2); border-radius: 7px; padding: 0.55rem 0.8rem; color: var(--text); font-size: 0.82rem; font-family: inherit; transition: border-color 0.12s; }
 .form-input:focus { outline: none; border-color: var(--purple); }
+.form-input:focus-visible { outline: 2px solid var(--purple); outline-offset: 1px; }
+button:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; border-radius: 4px; }
+.capture-input:focus-visible, .editor-note-input:focus-visible,
+.invite-input:focus-visible, .subscribe-input:focus-visible { outline: 2px solid var(--purple); outline-offset: 1px; }
 .form-input::placeholder { color: var(--muted); }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
 .form-footer { text-align: center; font-size: 0.69rem; color: var(--muted); margin-top: 0.9rem; }
@@ -570,6 +574,8 @@ nav { background: var(--s1); border-bottom: 1px solid var(--border); padding: 0 
   .sidebar, .right-sidebar { display: none; }
   .curator-layout { grid-template-columns: 1fr; }
   .curator-sidebar { display: none; }
+  .curadoria-layout { grid-template-columns: 1fr; }
+  .curadoria-sidebar { display: none; }
   .stats-grid { grid-template-columns: repeat(2,1fr); }
   .fonte-grid { grid-template-columns: repeat(3,1fr); }
   .fonte-mini-grid { grid-template-columns: repeat(3,1fr); }
@@ -832,8 +838,8 @@ nav { background: var(--s1); border-bottom: 1px solid var(--border); padding: 0 
 
 <!-- ══ TOAST ══ -->
 <div class="toast" id="toast">
-  <svg width="13" height="13" color="var(--sub)"><use href="#ic-brain"/></svg>
-  Aprendizado registrado
+  <svg width="13" height="13" color="var(--sub)" aria-hidden="true"><use href="#ic-brain"/></svg>
+  <span id="toast-msg">Aprendizado registrado</span>
 </div>
 
 <!-- ══ SVG SYMBOLS ══ -->
@@ -1035,9 +1041,9 @@ nav { background: var(--s1); border-bottom: 1px solid var(--border); padding: 0 
         Entrar com Google
       </button>
       <div class="divider"><span>ou entre com e-mail</span></div>
-      <div class="form-field"><label class="form-label">E-mail</label><input class="form-input" type="email" placeholder="seu@email.com"></div>
-      <div class="form-field"><label class="form-label">Senha</label><input class="form-input" type="password" placeholder="••••••••"></div>
-      <button class="btn-primary" onclick="goToLoginProfile()" style="margin-top:0.25rem">Entrar</button>
+      <div class="form-field"><label class="form-label" for="login-email">E-mail</label><input id="login-email" class="form-input" type="email" placeholder="seu@email.com"></div>
+      <div class="form-field"><label class="form-label" for="login-password">Senha</label><input id="login-password" class="form-input" type="password" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="goToLoginWithEmail()" style="margin-top:0.25rem">Entrar</button>
     </div>
 
     <!-- LOGIN — SELEÇÃO DE PERFIL (usuário já cadastrado) -->
@@ -1361,7 +1367,7 @@ nav { background: var(--s1); border-bottom: 1px solid var(--border); padding: 0 
       </div>
       <div class="public-nav-cta">
         <button class="btn-sm-ghost" onclick="show('curator')">← Voltar ao app</button>
-        <button class="btn-sm">Criar minha página</button>
+        <button class="btn-sm" onclick="createPublicPage()">Criar minha página</button>
       </div>
     </div>
 
@@ -1387,7 +1393,7 @@ nav { background: var(--s1); border-bottom: 1px solid var(--border); padding: 0 
         <div class="subscribe-title">Receber o digest de Bruno Gentil</div>
         <div class="subscribe-sub">Toda semana, direto no seu e-mail. Gratuito.</div>
         <div class="subscribe-row">
-          <input class="subscribe-input" type="email" placeholder="seu@email.com">
+          <input class="subscribe-input" id="subscribe-email" type="email" placeholder="seu@email.com">
           <button class="btn-sm" onclick="subscribeDemo(this)">Assinar</button>
         </div>
       </div>
@@ -1483,7 +1489,7 @@ nav { background: var(--s1); border-bottom: 1px solid var(--border); padding: 0 
           <div class="plan-name">Pro</div>
           <div class="plan-price" id="pf-pro-price">R$ 29<span>/mês</span></div>
           <div class="plan-desc">Digest completo com histórico e painel de progresso</div>
-          <button class="plan-btn plan-btn-primary">Assinar Pro</button>
+          <button class="plan-btn plan-btn-primary" onclick="showPlanCTA('Pro PF')">Assinar Pro</button>
           <ul class="plan-features">
             <li class="plan-feature"><span class="check">✓</span> Tudo do Free</li>
             <li class="plan-feature"><span class="check">✓</span> Digest ilimitado (todos os cards)</li>
@@ -1498,7 +1504,7 @@ nav { background: var(--s1); border-bottom: 1px solid var(--border); padding: 0 
           <div class="plan-name">Curator</div>
           <div class="plan-price" id="pf-curator-price">R$ 59<span>/mês</span></div>
           <div class="plan-desc">Para quem quer construir audiência distribuindo seus insights</div>
-          <button class="plan-btn plan-btn-primary">Assinar Curator</button>
+          <button class="plan-btn plan-btn-primary" onclick="showPlanCTA('Curator')">Assinar Curator</button>
           <ul class="plan-features">
             <li class="plan-feature"><span class="check">✓</span> Tudo do Pro</li>
             <li class="plan-feature"><span class="check">✓</span> Minha Curadoria (banco de referências)</li>
@@ -1536,7 +1542,7 @@ nav { background: var(--s1); border-bottom: 1px solid var(--border); padding: 0 
           <div class="plan-name">Pro</div>
           <div class="plan-price" id="pj-pro-price">R$ 49<span>/membro/mês</span></div>
           <div class="plan-desc">Inteligência coletiva completa para o time</div>
-          <button class="plan-btn plan-btn-primary">Assinar Pro</button>
+          <button class="plan-btn plan-btn-primary" onclick="showPlanCTA('Pro PJ')">Assinar Pro</button>
           <ul class="plan-features">
             <li class="plan-feature"><span class="check">✓</span> Membros ilimitados</li>
             <li class="plan-feature"><span class="check">✓</span> Tudo do Free</li>
@@ -1551,7 +1557,7 @@ nav { background: var(--s1); border-bottom: 1px solid var(--border); padding: 0 
           <div class="plan-name">Enterprise</div>
           <div class="plan-price" style="font-size:1.4rem">Custom</div>
           <div class="plan-desc">Para BUs e empresas com múltiplos times e necessidades específicas</div>
-          <button class="plan-btn plan-btn-ghost">Falar com time</button>
+          <button class="plan-btn plan-btn-ghost" onclick="showPlanCTA('Enterprise')">Falar com time</button>
           <ul class="plan-features">
             <li class="plan-feature"><span class="check">✓</span> Tudo do Pro</li>
             <li class="plan-feature"><span class="check">✓</span> Múltiplos times / BUs</li>
@@ -1843,8 +1849,8 @@ nav { background: var(--s1); border-bottom: 1px solid var(--border); padding: 0 
       </button>
     </div>
     <div class="invite-row" id="invite-row">
-      <input class="invite-input" type="email" placeholder="email@empresa.com">
-      <button class="btn-invite">Enviar convite</button>
+      <input class="invite-input" id="invite-email" type="email" placeholder="email@empresa.com">
+      <button class="btn-invite" onclick="sendInvite()">Enviar convite</button>
     </div>
     <div class="section-label" style="margin-top:0">3 overlaps identificados</div>
     <div class="overlap-card strong">
@@ -2186,6 +2192,16 @@ function hideAllSteps() {
 function goToLanding()  { hideAllSteps(); document.getElementById('step-landing').style.display = ''; }
 function goToLogin()        { hideAllSteps(); document.getElementById('step-login').style.display = ''; }
 function goToLoginProfile() { hideAllSteps(); document.getElementById('step-login-profile').style.display = ''; }
+
+function goToLoginWithEmail() {
+  const emailEl = document.getElementById('login-email');
+  const passEl  = document.getElementById('login-password');
+  let ok = true;
+  if (!emailEl.value.trim()) { emailEl.style.borderColor = 'var(--plum)'; emailEl.focus(); ok = false; }
+  if (!passEl.value.trim())  { passEl.style.borderColor  = 'var(--plum)'; if (ok) passEl.focus(); ok = false; }
+  if (!ok) { setTimeout(() => { emailEl.style.borderColor = ''; passEl.style.borderColor = ''; }, 2000); return; }
+  goToLoginProfile();
+}
 function goToProfile()  { hideAllSteps(); document.getElementById('step-profile').style.display = ''; }
 const profileMeta = {
   pf_basic:   { label: 'Pessoa física',      icon: 'ic-user',     isPJ: false },
@@ -2201,7 +2217,9 @@ function goToForm() {
   const meta = profileMeta[currentProfile];
   const badge = document.getElementById('form-badge');
   badge.innerHTML = `<svg width="12" height="12" color="var(--sub)"><use href="#${meta.icon}"/></svg> ${meta.label}`;
-  document.getElementById('pj-fields').style.display = meta.isPJ ? '' : 'none';
+  const pjFields = document.getElementById('pj-fields');
+  pjFields.style.display = meta.isPJ ? '' : 'none';
+  if (!meta.isPJ) pjFields.querySelectorAll('input, select').forEach(el => el.value = '');
 }
 function goToOnboard() {
   hideAllSteps();
@@ -2217,18 +2235,18 @@ function obShowQ(n) {
     const el = document.getElementById(i === 4 ? 'ob-result' : 'ob-q' + i);
     if (el) el.style.display = i === n ? '' : 'none';
   });
-  // atualiza progress dots
   const dot2 = document.getElementById('ob-dot-2');
   const dot3 = document.getElementById('ob-dot-3');
   const lbl3 = document.getElementById('ob-lbl-3');
-  if (n <= 3) {
-    dot2.className = n <= 3 ? 'onboard-dot active' : 'onboard-dot done';
-    dot2.textContent = n <= 3 ? '2' : '✓';
-    dot3.className = n === 4 ? 'onboard-dot done' : 'onboard-dot pending';
-    dot3.textContent = n === 4 ? '✓' : '3';
-    lbl3.className = n === 4 ? 'onboard-label active' : 'onboard-label';
-  }
-  if (n === 4) {
+  if (n <= 2) {
+    dot2.className = 'onboard-dot active'; dot2.textContent = '2';
+    dot3.className = 'onboard-dot pending'; dot3.textContent = '3';
+    lbl3.className = 'onboard-label';
+  } else if (n === 3) {
+    dot2.className = 'onboard-dot done'; dot2.textContent = '✓';
+    dot3.className = 'onboard-dot active'; dot3.textContent = '3';
+    lbl3.className = 'onboard-label active';
+  } else {
     dot2.className = 'onboard-dot done'; dot2.textContent = '✓';
     dot3.className = 'onboard-dot active'; dot3.textContent = '3';
     lbl3.className = 'onboard-label active';
@@ -2393,6 +2411,14 @@ function show(name) {
   const idx = items.findIndex(i => i.id === name);
   const tabs = document.querySelectorAll('.nav-tab');
   if (idx >= 0) tabs[idx].classList.add('active');
+  if (name === 'plans') {
+    const seg = (currentProfile === 'pj_admin' || currentProfile === 'pj_member') ? 'pj' : 'pf';
+    document.getElementById('plans-pf').style.display = seg === 'pf' ? '' : 'none';
+    document.getElementById('plans-pj').style.display = seg === 'pj' ? '' : 'none';
+    const segTabs = document.querySelectorAll('.segment-tab');
+    segTabs.forEach(t => t.classList.remove('active'));
+    segTabs[seg === 'pf' ? 0 : 1].classList.add('active');
+  }
 }
 
 function showLocked(label) {
@@ -2400,6 +2426,12 @@ function showLocked(label) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   const locked = document.getElementById('view-locked');
   locked.querySelector('.lock-title').textContent = label + ' — recurso Premium';
+  const msgs = {
+    pf_basic: 'Disponível no plano Pro (R$29/mês) — inclui histórico completo, painel de progresso e mais fontes.',
+    pj_admin: 'Disponível no plano Pro PJ (R$49/membro/mês) — desbloqueia Gestor, Histórico e Progresso da equipe.',
+  };
+  locked.querySelector('.lock-sub').textContent =
+    msgs[currentProfile] || 'Disponível nos planos pagos. Faça upgrade para desbloquear.';
   locked.classList.add('active');
 }
 
@@ -2422,7 +2454,24 @@ function renderFeed() {
 function loadSampleDigest() {
   digestLoaded = true;
   const feed = document.getElementById('feed-content');
+  feed.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:340px;gap:0.75rem;text-align:center;padding:2rem">
+      <div style="width:40px;height:40px;background:var(--s2);border-radius:12px;display:flex;align-items:center;justify-content:center">
+        <svg width="20" height="20" color="var(--muted)"><use href="#ic-brain"/></svg>
+      </div>
+      <div style="font-size:0.88rem;font-weight:500" id="loading-msg">Gerando seu digest…</div>
+      <div style="font-size:0.77rem;color:var(--muted)">Buscando sinais relevantes para o seu contexto</div>
+    </div>`;
+  const msgs = ['Analisando fontes…', 'Identificando conexões latentes…', 'Calculando relevância…'];
+  let mi = 0;
+  const cycle = setInterval(() => {
+    const el = document.getElementById('loading-msg');
+    if (el) el.textContent = msgs[mi++ % msgs.length];
+  }, 750);
+  setTimeout(() => { clearInterval(cycle); _renderSampleCards(feed); }, 2200);
+}
 
+function _renderSampleCards(feed) {
   const cards = [
     {
       id: 'card-a16z-ia',
@@ -2532,7 +2581,7 @@ function scorePicker(cardId, claudeScore) {
 function setScore(cardId, value, pickerEl) {
   const scores = getScores();
   scores[cardId] = value;
-  localStorage.setItem(SCORES_KEY, JSON.stringify(scores));
+  try { localStorage.setItem(SCORES_KEY, JSON.stringify(scores)); } catch(e) {}
 
   // atualiza o picker para mostrar o valor fixado
   const youEl = document.getElementById('you-' + cardId);
@@ -2541,10 +2590,16 @@ function setScore(cardId, value, pickerEl) {
   showToast();
 }
 
-function showToast() {
-  const t = document.getElementById('toast');
+function showToast(msg) {
+  const t   = document.getElementById('toast');
+  const lbl = document.getElementById('toast-msg');
+  if (showToast._t) clearTimeout(showToast._t);
+  if (msg && lbl) lbl.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
+  showToast._t = setTimeout(() => {
+    t.classList.remove('show');
+    if (msg && lbl) setTimeout(() => { lbl.textContent = 'Aprendizado registrado'; }, 300);
+  }, msg ? 3000 : 2200);
 }
 
 // ── SAVE LOGIC ──
@@ -2775,11 +2830,42 @@ function toggleFaq(item) { item.classList.toggle('open'); }
 // ── PUBLIC PAGE ──
 function subscribeDemo(btn) {
   if (btn && btn.tagName === 'BUTTON') {
+    const input = btn.closest('.subscribe-row')?.querySelector('.subscribe-input')
+                || document.getElementById('subscribe-email');
+    if (!input || !input.value.trim().includes('@')) {
+      if (input) { input.style.borderColor = 'var(--plum)'; input.focus(); setTimeout(() => input.style.borderColor = '', 2000); }
+      return;
+    }
     btn.textContent = '✓ Inscrito!';
     btn.style.background = 'var(--s2)';
     btn.style.color = 'var(--sub)';
     btn.disabled = true;
+    input.disabled = true;
   }
+}
+
+// ── PLAN / PAGE / INVITE CTAs ──
+function showPlanCTA(plan) {
+  const msg = plan === 'Enterprise'
+    ? 'Enterprise — fale com a gente: contato@lens.ai'
+    : `Plano ${plan} — em breve! Deixa seu e-mail em contato@lens.ai`;
+  showToast(msg);
+}
+
+function createPublicPage() {
+  showToast('Sua página já está ativa em lens.ai/c/brunogentil');
+}
+
+function sendInvite() {
+  const input = document.getElementById('invite-email');
+  if (!input || !input.value.trim().includes('@')) {
+    if (input) { input.style.borderColor = 'var(--plum)'; input.focus(); setTimeout(() => input.style.borderColor = '', 2000); }
+    return;
+  }
+  const email = input.value.trim();
+  input.value = '';
+  document.getElementById('invite-row').classList.remove('visible');
+  showToast('Convite enviado para ' + email);
 }
 
 // ── CURADORIA ──
@@ -2833,8 +2919,9 @@ function copyLink(el) {
   }, 1500);
 }
 
-document.querySelectorAll('.fonte-item, .fonte-mini').forEach(item => {
-  item.addEventListener('click', () => item.classList.toggle('active'));
+document.addEventListener('click', e => {
+  const target = e.target.closest('.fonte-item, .fonte-mini');
+  if (target) target.classList.toggle('active');
 });
 </script>
 </body>
