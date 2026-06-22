@@ -1,9 +1,21 @@
+export type Source = {
+  id: string
+  name: string
+  type: 'newsletter' | 'linkedin' | 'web'
+  category: string | null
+  url: string | null
+  active: boolean
+  last_featured_edition: number | null
+  frequency: number
+}
+
 export type Profile = {
   id: string
   full_name: string | null
   sector: string | null
   decision: string | null
   blind_spot: string | null
+  topic: string | null
   created_at: string
 }
 
@@ -15,10 +27,13 @@ export type Digest = {
   cards?: DigestCard[]
 }
 
+export type CardSource = { name: string; url: string }
+
 export type DigestCard = {
   id: string
   digest_id: string
   source: string
+  sources: CardSource[]
   title: string
   summary: string
   latent: string | null

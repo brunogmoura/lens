@@ -1,17 +1,28 @@
 'use client'
 
 import { useState } from 'react'
-import type { Digest, DigestCard } from '@/types'
-import DigestCardComponent from './DigestCard'
+import type { Digest, DigestCard, Source } from '@/types'
+import HeroCard from './HeroCard'
+import SecondaryCard from './SecondaryCard'
+import SourcesPanel from './SourcesPanel'
 import NavBar from '@/components/ui/NavBar'
+import HistoricoView from '@/components/history/HistoricoView'
+
+type HistoryDigest = Digest & { cards: DigestCard[] }
 
 type Props = {
   user: { id: string; name: string }
-  digest: (Digest & { cards: DigestCard[] }) | null
+  digest: HistoryDigest | null
+  allDigests: HistoryDigest[]
+  lastSeenAt: string | null
+  sources: Source[]
 }
 
-export default function DigestView({ user, digest }: Props) {
+type Tab = 'digest' | 'saved' | 'history'
+
+export default function DigestView({ user, digest, allDigests, lastSeenAt, sources }: Props) {
   const [cards, setCards] = useState<DigestCard[]>(digest?.cards ?? [])
+  const [tab, setTab] = useState<Tab>('digest')
 
   function handleScoreUpdate(cardId: string, score: number) {
     setCards(prev => prev.map(c => c.id === cardId ? { ...c, user_score: score } : c))
@@ -21,186 +32,110 @@ export default function DigestView({ user, digest }: Props) {
     setCards(prev => prev.map(c => c.id === cardId ? { ...c, is_saved: saved } : c))
   }
 
-  const insights  = cards.filter(c => !c.signal)
-  const signals   = cards.filter(c => c.signal)
-  const savedList = cards.filter(c => c.is_saved)
+  const sorted = [...cards].sort((a, b) => (b.claude_score ?? 0) - (a.claude_score ?? 0))
+  const hero = sorted[0] ?? null
+  const secondary = cards
+    .filter(c => c.id !== hero?.id)
+    .sort((a, b) => a.position - b.position)
+
+  const saved = cards.filter(c => c.is_saved)
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <NavBar userName={user.name} />
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
+      <NavBar userName={user.name} tab={tab} onTabChange={setTab} savedCount={saved.length} />
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '210px 1fr 195px',
-        flex: 1,
-        minHeight: 'calc(100vh - 50px)',
-      }} className="digest-grid">
-
-        {/* Sidebar esquerda — salvos */}
-        <aside style={{
-          background: 'var(--s1)', borderRight: '1px solid var(--border)',
-          padding: '1.1rem 0.85rem',
-        }}>
-          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: '0.7rem' }}>
-            Salvos esta semana
-          </div>
-
-          {savedList.length === 0 ? (
-            <div style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center', lineHeight: 1.5, padding: '1rem 0' }}>
-              Itens salvos<br />aparecerão aqui
-            </div>
-          ) : (
-            savedList.map(c => (
-              <div key={c.id} style={{ padding: '0.5rem 0.6rem', borderRadius: 7, marginBottom: '0.3rem', cursor: 'pointer' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'var(--s2)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                <div style={{ fontSize: '0.77rem', fontWeight: 500, lineHeight: 1.35, marginBottom: 2 }}>{c.title}</div>
-                <div style={{ fontSize: '0.66rem', color: 'var(--muted)' }}>{c.source}</div>
-              </div>
-            ))
-          )}
-
-          {savedList.length > 0 && (
-            <div style={{ background: 'var(--s2)', border: '1px solid var(--border)', borderRadius: 8, padding: '0.65rem', marginTop: '0.9rem', textAlign: 'center' }}>
-              <div style={{ fontSize: '1.35rem', fontWeight: 700 }}>{savedList.length}</div>
-              <div style={{ fontSize: '0.65rem', color: 'var(--muted)', marginTop: 1 }}>itens salvos</div>
-            </div>
-          )}
-        </aside>
-
-        {/* Feed principal */}
-        <main style={{ padding: '1.1rem' }}>
-          {!digest ? (
-            <EmptyDigest />
-          ) : (
+      <main style={{ flex: 1, maxWidth: 780, width: '100%', margin: '0 auto', padding: '2rem 1.25rem 4rem' }}>
+        {tab === 'digest' && (
+          !digest ? <EmptyDigest /> : (
             <>
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
-                <div style={{ fontSize: '0.82rem', fontWeight: 600 }}>
-                  {new Date(digest.published_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                </div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>
-                  Edição #{digest.edition} · {cards.length} insights
-                </div>
+              <div style={{ marginBottom: '2.5rem' }}>
+                <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+                  Edição #{digest.edition} · {new Date(digest.published_at + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                </span>
               </div>
 
-              {insights.length > 0 && (
+              {hero && (
+                <HeroCard card={hero} userId={user.id} onScoreUpdate={handleScoreUpdate} onSaveToggle={handleSaveToggle} />
+              )}
+
+              {secondary.length > 0 && (
                 <>
-                  <SectionLabel>Insights de mercado</SectionLabel>
-                  {insights.map(c => (
-                    <DigestCardComponent key={c.id} card={c} userId={user.id}
-                      onScoreUpdate={handleScoreUpdate} onSaveToggle={handleSaveToggle} />
-                  ))}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '2.5rem 0 1.25rem' }}>
+                    <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.12em', whiteSpace: 'nowrap' }}>
+                      Mais desta edição
+                    </span>
+                    <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    {secondary.map((c, i) => (
+                      <SecondaryCard key={c.id} card={c} userId={user.id} index={i + 1} onScoreUpdate={handleScoreUpdate} onSaveToggle={handleSaveToggle} />
+                    ))}
+                  </div>
                 </>
               )}
 
-              {signals.length > 0 && (
-                <>
-                  <SectionLabel>Sinais antecipados</SectionLabel>
-                  {signals.map(c => (
-                    <DigestCardComponent key={c.id} card={c} userId={user.id}
-                      onScoreUpdate={handleScoreUpdate} onSaveToggle={handleSaveToggle} />
-                  ))}
-                </>
-              )}
+              <SourcesPanel sources={sources} />
             </>
-          )}
-        </main>
+          )
+        )}
 
-        {/* Sidebar direita — stats */}
-        <aside style={{ borderLeft: '1px solid var(--border)', padding: '1.1rem 0.85rem' }}>
-          {digest && cards.length > 0 && (
-            <>
-              <SourceWidget cards={cards} />
-              <ThemeWidget cards={cards} />
-            </>
-          )}
-        </aside>
-      </div>
+        {tab === 'saved' && (
+          <SavedView cards={saved} userId={user.id} onScoreUpdate={handleScoreUpdate} onSaveToggle={handleSaveToggle} />
+        )}
 
-      <style>{`
-        @media (max-width: 900px) {
-          .digest-grid { grid-template-columns: 1fr !important; }
-          .digest-grid aside { display: none; }
-        }
-      `}</style>
+        {tab === 'history' && (
+          <HistoricoView digests={allDigests} currentDigestId={digest?.id ?? null} lastSeenAt={lastSeenAt} />
+        )}
+      </main>
     </div>
   )
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function SavedView({ cards, userId, onScoreUpdate, onSaveToggle }: {
+  cards: DigestCard[]
+  userId: string
+  onScoreUpdate: (id: string, score: number) => void
+  onSaveToggle: (id: string, saved: boolean) => void
+}) {
+  if (cards.length === 0) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 340, textAlign: 'center' }}>
+        <div style={{ width: 44, height: 44, background: 'var(--s2)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="var(--muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 3h10a1 1 0 011 1v13l-6-3.5L4 17V4a1 1 0 011-1z"/>
+          </svg>
+        </div>
+        <div style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.3rem' }}>Nenhum item salvo</div>
+        <div style={{ fontSize: '0.78rem', color: 'var(--muted)', lineHeight: 1.6, maxWidth: 240 }}>
+          Salve os insights que quiser revisitar e eles aparecerão aqui.
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div style={{
-      fontSize: '0.67rem', fontWeight: 700, textTransform: 'uppercase',
-      letterSpacing: '0.1em', color: 'var(--muted)',
-      margin: '1.1rem 0 0.65rem',
-      display: 'flex', alignItems: 'center', gap: 9,
-    }}>
-      {children}
-      <span style={{ flex: 1, height: 1, background: 'var(--border)', display: 'block' }} />
-    </div>
+    <>
+      <div style={{ marginBottom: '1.75rem' }}>
+        <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+          {cards.length} {cards.length === 1 ? 'item salvo' : 'itens salvos'}
+        </span>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        {cards.map(c => (
+          <SecondaryCard key={c.id} card={c} userId={userId} onScoreUpdate={onScoreUpdate} onSaveToggle={onSaveToggle} />
+        ))}
+      </div>
+    </>
   )
 }
 
 function EmptyDigest() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 340, textAlign: 'center', padding: '2rem' }}>
-      <div style={{ width: 48, height: 48, background: 'var(--s2)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
-        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="var(--muted)" strokeWidth="1.5">
-          <path d="M2 17c2-4 5-6 8-6s6 2 8 6M5 13c1.5-2.5 3-3.5 5-3.5s3.5 1 5 3.5M8 10V7M12 10V5" strokeLinecap="round"/>
-        </svg>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400, textAlign: 'center' }}>
+      <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.4rem' }}>Próxima edição a caminho</div>
+      <div style={{ fontSize: '0.8rem', color: 'var(--muted)', lineHeight: 1.6, maxWidth: 280 }}>
+        Você receberá um aviso quando a nova edição estiver pronta.
       </div>
-      <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.35rem' }}>Nenhum digest ainda</div>
-      <div style={{ fontSize: '0.8rem', color: 'var(--muted)', lineHeight: 1.5, maxWidth: 260 }}>
-        A primeira edição está sendo preparada. Você receberá um e-mail quando estiver pronta.
-      </div>
-    </div>
-  )
-}
-
-function SourceWidget({ cards }: { cards: DigestCard[] }) {
-  const counts: Record<string, number> = {}
-  cards.forEach(c => { counts[c.source] = (counts[c.source] ?? 0) + (c.claude_score ?? 0) })
-  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 4)
-  const max = sorted[0]?.[1] ?? 1
-
-  return (
-    <div style={{ background: 'var(--s2)', borderRadius: 8, padding: '0.85rem', marginBottom: '0.85rem' }}>
-      <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: '0.7rem' }}>
-        Score por fonte
-      </div>
-      {sorted.map(([name, score]) => (
-        <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
-          <div style={{ fontSize: '0.69rem', color: 'var(--sub)', width: 70, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
-          <div style={{ flex: 1, background: 'var(--border)', borderRadius: 3, height: 3, overflow: 'hidden' }}>
-            <div style={{ height: '100%', borderRadius: 3, background: 'var(--muted)', opacity: 0.8, width: `${Math.round((score / max) * 100)}%` }} />
-          </div>
-          <div style={{ fontSize: '0.67rem', fontWeight: 600, color: 'var(--sub)', width: 20, textAlign: 'right' }}>{score}</div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function ThemeWidget({ cards }: { cards: DigestCard[] }) {
-  const counts: Record<string, number> = {}
-  cards.forEach(c => c.tags.forEach(t => { counts[t] = (counts[t] ?? 0) + 1 }))
-  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 4)
-  const max = sorted[0]?.[1] ?? 1
-
-  return (
-    <div style={{ background: 'var(--s2)', borderRadius: 8, padding: '0.85rem' }}>
-      <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: '0.7rem' }}>
-        Temas desta semana
-      </div>
-      {sorted.map(([name, count]) => (
-        <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
-          <div style={{ fontSize: '0.69rem', color: 'var(--sub)', width: 70, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
-          <div style={{ flex: 1, background: 'var(--border)', borderRadius: 3, height: 3, overflow: 'hidden' }}>
-            <div style={{ height: '100%', borderRadius: 3, background: 'var(--muted)', opacity: 0.8, width: `${Math.round((count / max) * 100)}%` }} />
-          </div>
-          <div style={{ fontSize: '0.67rem', fontWeight: 600, color: 'var(--sub)', width: 20, textAlign: 'right' }}>{count}</div>
-        </div>
-      ))}
     </div>
   )
 }
