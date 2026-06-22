@@ -1,0 +1,2928 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lens — Inteligência de Mercado</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:       #0c0c10;
+  --s1:       #13131a;
+  --s2:       #1a1a24;
+  --border:   #22222e;
+  --border2:  #2c2c3a;
+  --text:     #e4e6f0;
+  --sub:      #9a9db5;
+  --muted:    #565870;
+  --purple:   #6d28d9;
+  --plum:     #8b5cf6;
+  --plum-dim: rgba(139,92,246,0.10);
+  --plum-br:  rgba(139,92,246,0.22);
+}
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; min-height: 100vh; font-size: 14px; }
+svg { display: block; flex-shrink: 0; }
+
+/* ── AUTH ── */
+.auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+.auth-box { width: 100%; max-width: 400px; }
+.auth-logo { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 0.4rem; }
+.auth-logo-mark { width: 34px; height: 34px; background: var(--purple); border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+.auth-logo-name { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.4px; }
+.auth-tagline { font-size: 0.78rem; color: var(--muted); text-align: center; margin-bottom: 2.25rem; }
+
+/* landing */
+.auth-landing { }
+.auth-landing-title { font-size: 1rem; font-weight: 600; text-align: center; margin-bottom: 0.3rem; }
+.auth-landing-sub { font-size: 0.8rem; color: var(--muted); text-align: center; margin-bottom: 1.5rem; }
+.btn-primary { width: 100%; background: var(--purple); border: none; border-radius: 8px; color: white; padding: 0.65rem; font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: opacity 0.12s; margin-bottom: 0.75rem; }
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:disabled { opacity: 0.35; cursor: default; }
+.auth-link { text-align: center; font-size: 0.78rem; color: var(--muted); }
+.auth-link a { color: var(--sub); text-decoration: none; cursor: pointer; }
+
+/* profile step */
+.profile-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 1.25rem; }
+.profile-card { background: var(--s1); border: 1px solid var(--border); border-radius: 11px; padding: 1rem 0.9rem 0.75rem; text-align: center; cursor: pointer; transition: all 0.13s; position: relative; }
+.profile-card:hover { border-color: var(--border2); background: var(--s2); }
+.profile-card.selected { border-color: var(--purple); background: var(--s2); }
+.profile-card-icon { width: 32px; height: 32px; background: var(--s2); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.5rem; }
+.profile-card.selected .profile-card-icon { background: var(--s2); }
+.profile-card-title { font-size: 0.87rem; font-weight: 600; margin-bottom: 2px; }
+.profile-card.selected .profile-card-title { color: var(--text); }
+.profile-card-desc { font-size: 0.68rem; color: var(--muted); line-height: 1.4; margin-bottom: 0.6rem; }
+.profile-plan-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: 20px; padding: 2px 8px;
+  font-size: 0.63rem; font-weight: 700; margin-bottom: 0.65rem;
+}
+.profile-plan-badge.free { background: var(--s2); border: 1px solid var(--border2); color: var(--muted); }
+.profile-plan-badge.paid { background: rgba(109,40,217,0.15); border: 1px solid rgba(139,92,246,0.35); color: var(--plum); }
+.profile-explore-btn {
+  display: block; width: 100%;
+  background: none; border: 1px solid var(--border2);
+  border-radius: 7px; padding: 4px 0;
+  font-size: 0.69rem; font-weight: 600; color: var(--muted);
+  font-family: inherit; cursor: pointer; transition: all 0.12s;
+  text-align: center;
+}
+.profile-explore-btn:hover { border-color: var(--purple); color: var(--sub); background: var(--s2); }
+.profile-card.selected .profile-explore-btn { border-color: var(--purple); color: var(--sub); }
+
+/* form step */
+.back-btn { display: flex; align-items: center; gap: 5px; font-size: 0.74rem; color: var(--muted); cursor: pointer; margin-bottom: 1.1rem; background: none; border: none; padding: 0; font-family: inherit; }
+.back-btn:hover { color: var(--sub); }
+.form-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--s2); border: 1px solid var(--border2); border-radius: 20px; padding: 3px 10px; font-size: 0.7rem; color: var(--sub); font-weight: 600; margin-bottom: 1.1rem; }
+.btn-google { width: 100%; background: var(--s1); border: 1px solid var(--border2); border-radius: 8px; padding: 0.6rem 1rem; color: var(--text); font-size: 0.82rem; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 9px; transition: background 0.12s; margin-bottom: 0.9rem; }
+.btn-google:hover { background: var(--s2); }
+.divider { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.9rem; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.divider span { font-size: 0.7rem; color: var(--muted); }
+.form-field { margin-bottom: 0.65rem; }
+.form-label { font-size: 0.68rem; font-weight: 600; color: var(--muted); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.06em; }
+.form-input { width: 100%; background: var(--s1); border: 1px solid var(--border2); border-radius: 7px; padding: 0.55rem 0.8rem; color: var(--text); font-size: 0.82rem; font-family: inherit; transition: border-color 0.12s; }
+.form-input:focus { outline: none; border-color: var(--purple); }
+.form-input:focus-visible { outline: 2px solid var(--purple); outline-offset: 1px; }
+button:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; border-radius: 4px; }
+.capture-input:focus-visible, .editor-note-input:focus-visible,
+.invite-input:focus-visible, .subscribe-input:focus-visible { outline: 2px solid var(--purple); outline-offset: 1px; }
+.form-input::placeholder { color: var(--muted); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
+.form-footer { text-align: center; font-size: 0.69rem; color: var(--muted); margin-top: 0.9rem; }
+.form-footer a { color: var(--sub); text-decoration: none; }
+
+/* onboarding */
+.onboard-progress { display: flex; align-items: center; gap: 0; margin-bottom: 1.75rem; }
+.onboard-step { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; }
+.onboard-dot { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; }
+.onboard-dot.done { background: var(--purple); color: white; }
+.onboard-dot.active { background: var(--s2); border: 1px solid var(--border2); color: var(--sub); }
+.onboard-dot.pending { background: var(--s2); color: var(--muted); }
+.onboard-label { color: var(--muted); }
+.onboard-label.active { color: var(--text); font-weight: 500; }
+.onboard-line { flex: 1; height: 1px; background: var(--border); margin: 0 8px; }
+.onboard-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem; }
+.onboard-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 1.25rem; }
+.fonte-mini-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.5rem; margin-bottom: 1rem; }
+.fonte-mini { background: var(--s1); border: 1px solid var(--border); border-radius: 9px; padding: 0.7rem 0.5rem; text-align: center; cursor: pointer; transition: all 0.12s; }
+.fonte-mini:hover { border-color: var(--border2); }
+.fonte-mini.active { border-color: var(--purple); background: var(--s2); }
+.fonte-mini-icon { width: 28px; height: 28px; background: var(--s2); border-radius: 7px; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; }
+.fonte-mini.active .fonte-mini-icon { background: var(--s2); }
+.fonte-mini-name { font-size: 0.68rem; font-weight: 500; color: var(--sub); }
+.fonte-mini.active .fonte-mini-name { color: var(--text); }
+.btn-skip { width: 100%; background: none; border: 1px solid var(--border2); border-radius: 8px; color: var(--muted); padding: 0.55rem; font-size: 0.8rem; font-family: inherit; cursor: pointer; margin-top: 0.5rem; }
+.btn-skip:hover { color: var(--sub); border-color: var(--border2); }
+
+/* empty state */
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 340px; text-align: center; padding: 2rem; }
+.empty-icon { width: 48px; height: 48px; background: var(--s2); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+.empty-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.35rem; }
+.empty-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.25rem; max-width: 260px; line-height: 1.5; }
+.btn-cta { background: var(--purple); border: none; border-radius: 7px; color: white; padding: 0.55rem 1.25rem; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; }
+
+/* ── NAV ── */
+nav { background: var(--s1); border-bottom: 1px solid var(--border); padding: 0 1.5rem; display: flex; align-items: center; height: 50px; position: sticky; top: 0; z-index: 100; }
+.logo { font-weight: 700; font-size: 0.95rem; color: var(--text); letter-spacing: -0.3px; margin-right: 1.75rem; display: flex; align-items: center; gap: 7px; }
+.logo-mark { width: 22px; height: 22px; background: var(--purple); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+.nav-tabs { display: flex; }
+.nav-tab { padding: 0 0.9rem; height: 50px; display: flex; align-items: center; font-size: 0.8rem; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.12s, border-color 0.12s; white-space: nowrap; }
+.nav-tab:hover { color: var(--sub); }
+.nav-tab.active { color: var(--text); border-bottom-color: var(--plum); }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 9px; }
+.pill { background: var(--s2); border: 1px solid var(--border2); border-radius: 20px; padding: 2px 9px; font-size: 0.7rem; color: var(--sub); }
+.avatar { width: 27px; height: 27px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: white; cursor: pointer; }
+
+/* ── VIEWS ── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── CARDS ── */
+.card { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 0.95rem 1.05rem; margin-bottom: 0.55rem; transition: border-color 0.12s; }
+.card:hover { border-color: var(--border2); }
+.card.signal { border-left: 2px solid var(--border2); }
+.card-source { font-size: 0.65rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+.card-title { font-size: 0.87rem; font-weight: 600; line-height: 1.45; margin-bottom: 0.4rem; }
+.card-summary { font-size: 0.79rem; color: var(--sub); line-height: 1.58; margin-bottom: 0.65rem; }
+.latent { background: var(--s2); border: 1px solid var(--border2); border-radius: 7px; padding: 0.45rem 0.7rem; margin-bottom: 0.65rem; }
+.latent-label { font-size: 0.62rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+.latent-text { font-size: 0.76rem; color: var(--sub); line-height: 1.45; }
+.card-footer { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+.tag { background: var(--s2); border: 1px solid var(--border); border-radius: 20px; padding: 2px 8px; font-size: 0.66rem; color: var(--muted); }
+.score-group { margin-left: auto; display: flex; align-items: center; gap: 7px; }
+.score { display: flex; align-items: center; gap: 3px; font-size: 0.69rem; }
+.score-lbl { color: var(--muted); }
+.score-val { font-weight: 700; }
+.score-val.hi { color: var(--text); }
+.btn-save { background: none; border: 1px solid var(--border2); border-radius: 5px; color: var(--muted); padding: 3px 9px; font-size: 0.69rem; cursor: pointer; transition: all 0.12s; }
+.btn-save:hover { border-color: var(--border2); color: var(--sub); }
+.btn-save.saved { border-color: var(--border2); color: var(--sub); background: var(--s2); }
+.horizon { font-size: 0.65rem; padding: 2px 8px; border-radius: 20px; font-weight: 600; background: var(--s2); border: 1px solid var(--border2); color: var(--sub); }
+
+/* ── SCORE PICKER ── */
+.score-picker { display: flex; align-items: center; gap: 3px; }
+.score-pip {
+  width: 22px; height: 22px; border-radius: 5px;
+  background: var(--s2); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 700; color: var(--muted);
+  cursor: pointer; transition: all 0.1s; user-select: none;
+}
+.score-pip:hover { border-color: var(--border2); color: var(--sub); }
+.score-pip.active { background: var(--purple); border-color: var(--purple); color: white; }
+.score-pip.dim { opacity: 0.35; }
+.score-lbl-inline { font-size: 0.69rem; color: var(--muted); margin-right: 4px; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(10px);
+  background: var(--s2); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 0.5rem 1rem;
+  font-size: 0.78rem; color: var(--sub);
+  display: flex; align-items: center; gap: 7px;
+  opacity: 0; transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none; z-index: 200; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── CURADORIA ── */
+.curadoria-layout { display: grid; grid-template-columns: 1fr 300px; min-height: calc(100vh - 50px); }
+.curadoria-main { padding: 1.25rem 1.5rem; border-right: 1px solid var(--border); }
+.curadoria-sidebar { padding: 1.25rem 1rem; background: var(--s1); }
+.capture-bar {
+  display: flex; gap: 0.55rem; align-items: flex-start;
+  background: var(--s1); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 0.75rem 0.9rem; margin-bottom: 1.25rem;
+  transition: border-color 0.12s;
+}
+.capture-bar:focus-within { border-color: var(--purple); }
+.capture-input {
+  flex: 1; background: none; border: none; color: var(--text);
+  font-size: 0.83rem; font-family: inherit; resize: none;
+  min-height: 38px; line-height: 1.5;
+}
+.capture-input:focus { outline: none; }
+.capture-input::placeholder { color: var(--muted); }
+.capture-actions { display: flex; flex-direction: column; gap: 0.4rem; align-items: flex-end; }
+.capture-tag-row { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+.capture-tag-opt {
+  background: var(--s2); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 2px 9px; font-size: 0.67rem;
+  color: var(--muted); cursor: pointer; transition: all 0.1s;
+}
+.capture-tag-opt:hover, .capture-tag-opt.sel { border-color: var(--border2); color: var(--sub); background: var(--s2); }
+.btn-capture {
+  background: var(--purple); border: none; border-radius: 6px;
+  color: white; padding: 5px 12px; font-size: 0.75rem; font-weight: 600;
+  font-family: inherit; cursor: pointer; white-space: nowrap;
+}
+.ref-item {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 0.55rem;
+  transition: border-color 0.12s;
+}
+.ref-item:hover { border-color: var(--border2); }
+.ref-item.connected { border-left: 2px solid var(--border2); }
+.ref-header { display: flex; align-items: flex-start; gap: 0.6rem; margin-bottom: 0.4rem; }
+.ref-type { width: 24px; height: 24px; border-radius: 6px; background: var(--s2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.ref-title { font-size: 0.83rem; font-weight: 500; line-height: 1.4; flex: 1; }
+.ref-date { font-size: 0.65rem; color: var(--muted); flex-shrink: 0; }
+.ref-note { font-size: 0.77rem; color: var(--sub); line-height: 1.5; margin-bottom: 0.5rem; margin-left: 1.85rem; }
+.ref-footer { display: flex; align-items: center; gap: 0.4rem; margin-left: 1.85rem; }
+.ref-connection {
+  background: var(--s2); border: 1px solid var(--border2);
+  border-radius: 7px; padding: 0.45rem 0.65rem; margin-left: 1.85rem; margin-bottom: 0.5rem;
+}
+.ref-connection-label { font-size: 0.62rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 2px; }
+.ref-connection-text { font-size: 0.75rem; color: var(--sub); line-height: 1.4; }
+.conn-card {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 9px; padding: 0.75rem 0.85rem; margin-bottom: 0.5rem;
+}
+.conn-card-label { font-size: 0.62rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 5px; }
+.conn-card-title { font-size: 0.78rem; font-weight: 500; color: var(--sub); line-height: 1.4; margin-bottom: 0.35rem; }
+.conn-card-why { font-size: 0.73rem; color: var(--muted); line-height: 1.4; }
+.conn-card-why em { color: var(--sub); font-style: normal; }
+.btn-use { background: none; border: 1px solid var(--border2); border-radius: 5px; color: var(--sub); padding: 3px 9px; font-size: 0.68rem; cursor: pointer; margin-top: 0.5rem; font-family: inherit; }
+.btn-use:hover { background: var(--s2); }
+.filter-row { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.filter-chip {
+  background: var(--s2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 3px 10px; font-size: 0.7rem;
+  color: var(--muted); cursor: pointer; transition: all 0.12s;
+}
+.filter-chip:hover { border-color: var(--border2); color: var(--sub); }
+.filter-chip.active { border-color: var(--border2); color: var(--text); background: var(--s2); }
+.bank-count { font-size: 0.7rem; color: var(--muted); margin-bottom: 0.75rem; }
+
+/* ── PUBLIC PAGE ── */
+.public-wrap { min-height: 100vh; background: var(--bg); }
+.public-nav { background: var(--s1); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 50px; display: flex; align-items: center; justify-content: space-between; }
+.public-nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.95rem; }
+.public-nav-mark { width: 22px; height: 22px; background: var(--purple); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+.public-nav-cta { display: flex; align-items: center; gap: 8px; }
+.btn-sm { background: var(--purple); border: none; border-radius: 6px; color: white; padding: 5px 14px; font-size: 0.78rem; font-weight: 600; font-family: inherit; cursor: pointer; }
+.btn-sm-ghost { background: none; border: 1px solid var(--border2); border-radius: 6px; color: var(--sub); padding: 5px 14px; font-size: 0.78rem; font-family: inherit; cursor: pointer; }
+.public-hero { max-width: 640px; margin: 0 auto; padding: 3rem 1.5rem 2rem; }
+.public-curator-card { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+.public-curator-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; color: white; flex-shrink: 0; }
+.public-curator-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 3px; }
+.public-curator-handle { font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; }
+.public-curator-stats { display: flex; gap: 1rem; }
+.public-stat { font-size: 0.72rem; color: var(--sub); }
+.public-stat strong { color: var(--text); font-weight: 600; }
+.public-bio { font-size: 0.85rem; color: var(--sub); line-height: 1.65; margin-bottom: 1.5rem; }
+.subscribe-box { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 2rem; }
+.subscribe-title { font-size: 0.88rem; font-weight: 600; margin-bottom: 0.25rem; }
+.subscribe-sub { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.85rem; }
+.subscribe-row { display: flex; gap: 0.5rem; }
+.subscribe-input { flex: 1; background: var(--s2); border: 1px solid var(--border2); border-radius: 7px; padding: 0.55rem 0.8rem; color: var(--text); font-size: 0.82rem; font-family: inherit; }
+.subscribe-input:focus { outline: none; border-color: var(--purple); }
+.public-editions { max-width: 640px; margin: 0 auto; padding: 0 1.5rem 3rem; }
+.public-edition { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 0.55rem; cursor: pointer; transition: border-color 0.12s; }
+.public-edition:hover { border-color: var(--border2); }
+.public-edition-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+.public-edition-num { font-size: 0.68rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+.public-edition-title { font-size: 0.88rem; font-weight: 600; flex: 1; }
+.public-edition-date { font-size: 0.7rem; color: var(--muted); }
+.public-edition-preview { font-size: 0.78rem; color: var(--sub); line-height: 1.5; margin-bottom: 0.5rem; }
+.public-edition-note { background: var(--s2); border: 1px solid var(--border2); border-radius: 7px; padding: 0.5rem 0.7rem; font-size: 0.76rem; color: var(--sub); line-height: 1.45; font-style: italic; }
+.public-locked-edition { background: var(--s1); border: 1px dashed var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 0.55rem; display: flex; align-items: center; gap: 0.75rem; opacity: 0.6; }
+.public-locked-text { font-size: 0.8rem; color: var(--muted); }
+.public-locked-text a { color: var(--sub); cursor: pointer; }
+
+/* ── PLANS ── */
+.plans-wrap { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+.plans-header { text-align: center; margin-bottom: 2.5rem; }
+.plans-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.4rem; }
+.plans-sub { font-size: 0.82rem; color: var(--muted); }
+.plans-toggle { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-top: 1rem; }
+.toggle-option { font-size: 0.78rem; color: var(--muted); cursor: pointer; }
+.toggle-option.active { color: var(--text); font-weight: 600; }
+.toggle-switch { width: 36px; height: 20px; background: var(--purple); border-radius: 10px; position: relative; cursor: pointer; }
+.toggle-switch::after { content: ''; width: 14px; height: 14px; background: white; border-radius: 50%; position: absolute; top: 3px; right: 3px; transition: right 0.15s; }
+.toggle-switch.yearly::after { right: 19px; }
+.plans-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 2rem; }
+.plan-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.25rem; position: relative; }
+.plan-card.featured { border-color: var(--purple); background: linear-gradient(160deg, rgba(109,40,217,0.08) 0%, var(--s1) 100%); }
+.plan-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--purple); color: white; border-radius: 20px; padding: 2px 12px; font-size: 0.67rem; font-weight: 700; white-space: nowrap; }
+.plan-name { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 0.5rem; }
+.plan-price { font-size: 2rem; font-weight: 700; margin-bottom: 0.2rem; line-height: 1; }
+.plan-price span { font-size: 0.8rem; font-weight: 400; color: var(--muted); }
+.plan-desc { font-size: 0.74rem; color: var(--muted); margin-bottom: 1.1rem; line-height: 1.4; }
+.plan-btn { width: 100%; border-radius: 7px; padding: 0.55rem; font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; margin-bottom: 1.1rem; }
+.plan-btn-primary { background: var(--purple); border: none; color: white; }
+.plan-btn-ghost { background: none; border: 1px solid var(--border2); color: var(--sub); }
+.plan-features { list-style: none; }
+.plan-feature { display: flex; align-items: flex-start; gap: 7px; font-size: 0.76rem; color: var(--sub); margin-bottom: 0.5rem; line-height: 1.4; }
+.plan-feature .check { color: var(--sub); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.plan-feature .cross { color: var(--muted); flex-shrink: 0; }
+.plan-divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0 1.5rem; }
+.plans-faq { max-width: 560px; margin: 0 auto; }
+.faq-title { font-size: 0.88rem; font-weight: 600; text-align: center; margin-bottom: 1.25rem; }
+.faq-item { border-bottom: 1px solid var(--border); padding: 0.85rem 0; cursor: pointer; }
+.faq-q { font-size: 0.82rem; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
+.faq-a { font-size: 0.78rem; color: var(--muted); line-height: 1.55; margin-top: 0.5rem; display: none; }
+.faq-item.open .faq-a { display: block; }
+.faq-item.open .faq-arrow { transform: rotate(180deg); }
+.faq-arrow { transition: transform 0.15s; color: var(--muted); }
+.segment-tabs { display: flex; background: var(--s2); border-radius: 8px; padding: 3px; margin: 0 auto 2rem; width: fit-content; }
+.segment-tab { padding: 5px 18px; border-radius: 6px; font-size: 0.78rem; cursor: pointer; color: var(--muted); transition: all 0.12s; }
+.segment-tab.active { background: var(--s1); color: var(--text); font-weight: 600; }
+
+/* ── FREEMIUM LOCK ── */
+.lock-overlay {
+  position: relative; pointer-events: none;
+}
+.lock-overlay::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, var(--bg) 100%);
+  border-radius: 10px; z-index: 1;
+}
+.lock-banner {
+  background: var(--s1); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 1.25rem; text-align: center;
+  margin-top: -1rem; position: relative; z-index: 2;
+}
+.lock-icon { width: 36px; height: 36px; background: var(--s2); border-radius: 9px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.6rem; }
+.lock-title { font-size: 0.88rem; font-weight: 600; margin-bottom: 0.25rem; }
+.lock-sub { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.9rem; line-height: 1.4; }
+.btn-upgrade { background: var(--purple); border: none; border-radius: 7px; color: white; padding: 0.5rem 1.25rem; font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; }
+
+/* ── PROGRESS ── */
+.progress-layout { max-width: 720px; margin: 0 auto; padding: 1.5rem 1.25rem; }
+.progress-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem; }
+.progress-card { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+.progress-card-label { font-size: 0.66rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 0.85rem; }
+/* score chart */
+.chart-bars { display: flex; align-items: flex-end; gap: 5px; height: 72px; margin-bottom: 0.5rem; }
+.chart-bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+.chart-bar { width: 100%; border-radius: 4px 4px 0 0; background: var(--s2); border: 1px solid var(--border2); transition: background 0.15s; min-height: 6px; }
+.chart-bar.current { background: var(--purple); border-color: var(--purple); opacity: 0.85; }
+.chart-bar:hover { opacity: 1 !important; }
+.chart-bar-val { font-size: 0.62rem; color: var(--muted); }
+.chart-bar-lbl { font-size: 0.58rem; color: var(--muted); white-space: nowrap; }
+.chart-delta { font-size: 0.72rem; color: var(--sub); margin-top: 0.25rem; }
+.chart-delta strong { color: var(--text); }
+/* source ranking */
+.source-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.55rem; }
+.source-rank { font-size: 0.65rem; font-weight: 700; color: var(--muted); width: 14px; text-align: right; }
+.source-name { font-size: 0.78rem; flex: 1; }
+.source-bar-wrap { width: 60px; background: var(--border); border-radius: 3px; height: 4px; }
+.source-bar-fill { height: 100%; border-radius: 3px; background: var(--sub); opacity: 0.5; }
+.source-score { font-size: 0.7rem; font-weight: 700; color: var(--sub); width: 22px; text-align: right; }
+/* theme cloud */
+.theme-cloud { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.theme-bubble {
+  border-radius: 20px; padding: 3px 10px;
+  font-size: 0.7rem; font-weight: 600;
+  background: var(--s2); border: 1px solid var(--border2); color: var(--sub);
+  transition: all 0.12s;
+}
+.theme-bubble.lg { font-size: 0.8rem; padding: 4px 12px; background: var(--s2); border-color: var(--border2); color: var(--text); }
+.theme-bubble.md { font-size: 0.74rem; padding: 3px 10px; border-color: var(--border2); color: var(--sub); }
+/* momentum */
+.momentum-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
+.momentum-row:last-child { border-bottom: none; }
+.momentum-icon { width: 28px; height: 28px; border-radius: 7px; background: var(--s2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.momentum-text { flex: 1; font-size: 0.78rem; color: var(--sub); line-height: 1.4; }
+.momentum-text strong { color: var(--text); font-weight: 600; }
+.momentum-val { font-size: 0.75rem; font-weight: 700; color: var(--sub); flex-shrink: 0; }
+
+/* ── HISTORY ── */
+.history-layout { max-width: 720px; margin: 0 auto; padding: 1.5rem 1.25rem; }
+.history-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.65rem; margin-bottom: 1.5rem; }
+.history-timeline { position: relative; }
+.history-timeline::before { content: ''; position: absolute; left: 15px; top: 0; bottom: 0; width: 1px; background: var(--border); }
+.history-entry {
+  position: relative; padding-left: 2.75rem; margin-bottom: 0.65rem;
+}
+.history-dot {
+  position: absolute; left: 8px; top: 14px;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--s2); border: 2px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+}
+.history-dot.current { background: var(--sub); border-color: var(--sub); }
+.history-dot.current::after { content: ''; width: 5px; height: 5px; background: white; border-radius: 50%; }
+.history-card {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 10px; padding: 0.9rem 1rem; cursor: pointer;
+  transition: border-color 0.12s;
+}
+.history-card:hover { border-color: var(--border2); }
+.history-card.open { border-color: var(--border2); }
+.history-card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+.history-date { font-size: 0.82rem; font-weight: 600; }
+.history-gap { font-size: 0.7rem; color: var(--muted); }
+.history-badge { margin-left: auto; font-size: 0.67rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.history-themes { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+.history-theme { background: var(--s2); border: 1px solid var(--border); border-radius: 20px; padding: 2px 8px; font-size: 0.67rem; color: var(--muted); }
+.history-footer { display: flex; align-items: center; justify-content: space-between; }
+.history-scores { display: flex; gap: 1rem; }
+.history-score-item { font-size: 0.7rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+.history-score-val { font-weight: 700; color: var(--sub); }
+.history-score-val.up { color: var(--sub); }
+.history-expand { font-size: 0.7rem; color: var(--sub); }
+.history-preview { display: none; border-top: 1px solid var(--border); margin-top: 0.75rem; padding-top: 0.75rem; }
+.history-preview.open { display: block; }
+.history-preview-item { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.45rem 0; border-bottom: 1px solid var(--border); }
+.history-preview-item:last-child { border-bottom: none; }
+.history-preview-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); margin-top: 6px; flex-shrink: 0; }
+.history-preview-title { font-size: 0.78rem; color: var(--sub); line-height: 1.4; flex: 1; }
+.history-preview-score { font-size: 0.67rem; font-weight: 700; color: var(--sub); flex-shrink: 0; }
+.score-trend { display: flex; align-items: center; gap: 8px; background: var(--s2); border: 1px solid var(--border2); border-radius: 8px; padding: 0.6rem 0.85rem; margin-bottom: 1.25rem; font-size: 0.78rem; color: var(--sub); }
+.score-trend strong { color: var(--text); }
+
+/* ── SECTION LABEL ── */
+.section-label { font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 1.1rem 0 0.65rem; display: flex; align-items: center; gap: 9px; }
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── INDIVIDUAL LAYOUT ── */
+.digest-layout { display: grid; grid-template-columns: 210px 1fr 195px; min-height: calc(100vh - 50px); }
+.sidebar { background: var(--s1); border-right: 1px solid var(--border); padding: 1.1rem 0.85rem; }
+.sidebar-title { font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 0.7rem; }
+.saved-item { padding: 0.5rem 0.6rem; border-radius: 7px; margin-bottom: 0.3rem; cursor: pointer; transition: background 0.1s; }
+.saved-item:hover { background: var(--s2); }
+.saved-item-title { font-size: 0.77rem; font-weight: 500; line-height: 1.35; margin-bottom: 2px; }
+.saved-item-meta { font-size: 0.66rem; color: var(--muted); }
+.saved-count { background: var(--s2); border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem; margin-top: 0.9rem; text-align: center; }
+.saved-count-num { font-size: 1.35rem; font-weight: 700; color: var(--text); }
+.saved-count-lbl { font-size: 0.65rem; color: var(--muted); margin-top: 1px; }
+.feed { padding: 1.1rem 1.1rem; }
+.feed-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.85rem; }
+.feed-title { font-size: 0.82rem; font-weight: 600; }
+.feed-meta { font-size: 0.7rem; color: var(--muted); }
+.right-sidebar { border-left: 1px solid var(--border); padding: 1.1rem 0.85rem; }
+.widget { background: var(--s2); border-radius: 8px; padding: 0.85rem; margin-bottom: 0.85rem; }
+.widget-title { font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 0.7rem; }
+.bar-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.bar-lbl { font-size: 0.69rem; color: var(--sub); width: 70px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-wrap { flex: 1; background: var(--border); border-radius: 3px; height: 3px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; background: var(--muted); opacity: 0.8; }
+.bar-num { font-size: 0.67rem; font-weight: 600; color: var(--sub); width: 20px; text-align: right; }
+
+/* ── PAGE LAYOUT (team/manager) ── */
+.page-layout { max-width: 780px; margin: 0 auto; padding: 1.5rem 1.25rem; }
+.page-header { margin-bottom: 1.25rem; }
+.page-title { font-size: 1rem; font-weight: 700; margin-bottom: 3px; }
+.page-sub { font-size: 0.78rem; color: var(--muted); }
+
+/* ── TEAM ── */
+.member-row { display: flex; gap: 0.55rem; margin-bottom: 1.25rem; flex-wrap: wrap; align-items: center; }
+.member-chip { display: flex; align-items: center; gap: 6px; background: var(--s1); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; }
+.m-avatar { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.58rem; font-weight: 700; color: white; }
+.m-name { font-size: 0.76rem; color: var(--sub); }
+.invite-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px dashed var(--border2); border-radius: 20px; padding: 4px 10px; font-size: 0.74rem; color: var(--muted); cursor: pointer; font-family: inherit; transition: all 0.12s; }
+.invite-btn:hover { border-color: var(--border2); color: var(--sub); }
+.invite-row { display: none; background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 0.75rem; }
+.invite-row.visible { display: flex; gap: 0.65rem; align-items: center; }
+.invite-input { flex: 1; background: var(--s2); border: 1px solid var(--border2); border-radius: 6px; padding: 0.5rem 0.75rem; color: var(--text); font-size: 0.8rem; font-family: inherit; }
+.invite-input:focus { outline: none; border-color: var(--purple); }
+.btn-invite { background: var(--purple); border: none; border-radius: 6px; color: white; padding: 0.5rem 1rem; font-size: 0.78rem; font-weight: 600; font-family: inherit; cursor: pointer; white-space: nowrap; }
+.overlap-card { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 0.95rem 1.05rem; margin-bottom: 0.55rem; }
+.overlap-card.strong { border-left: 2px solid var(--border2); }
+.ov-header { display: flex; gap: 0.85rem; margin-bottom: 0.55rem; align-items: flex-start; }
+.ov-avatars { display: flex; margin-top: 3px; }
+.ov-av { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.58rem; font-weight: 700; color: white; border: 2px solid var(--s1); margin-left: -5px; }
+.ov-av:first-child { margin-left: 0; }
+.ov-badge { display: inline-flex; align-items: center; background: var(--s2); border: 1px solid var(--border2); color: var(--sub); border-radius: 20px; padding: 2px 8px; font-size: 0.65rem; font-weight: 600; margin-bottom: 3px; }
+.ov-title { font-size: 0.85rem; font-weight: 600; line-height: 1.4; }
+.ov-source { font-size: 0.67rem; color: var(--muted); margin-top: 2px; }
+.ov-summary { font-size: 0.78rem; color: var(--sub); line-height: 1.55; margin-bottom: 0.4rem; }
+.ov-theme { font-size: 0.69rem; color: var(--muted); }
+.ov-theme em { color: var(--sub); font-style: normal; font-weight: 500; }
+
+/* ── MANAGER ── */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.65rem; margin-bottom: 1.25rem; }
+.stat { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem; }
+.stat-num { font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.stat-lbl { font-size: 0.7rem; color: var(--muted); }
+.signal-box { background: var(--s2); border: 1px solid var(--border2); border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 1.1rem; }
+.signal-box-lbl { font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
+.signal-box-text { font-size: 0.8rem; color: var(--sub); line-height: 1.55; }
+.signal-box-text strong { color: var(--text); font-weight: 600; }
+.theme-row { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem 0.95rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.85rem; }
+.theme-icon { width: 34px; height: 34px; border-radius: 8px; background: var(--s2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.theme-content { flex: 1; }
+.theme-name { font-size: 0.84rem; font-weight: 600; margin-bottom: 2px; }
+.theme-desc { font-size: 0.72rem; color: var(--muted); }
+.theme-right { text-align: right; flex-shrink: 0; }
+.theme-count { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+.theme-persons { font-size: 0.65rem; color: var(--muted); }
+.trend { font-size: 0.66rem; color: var(--sub); margin-top: 2px; }
+
+/* ── CURATOR ── */
+.curator-layout { display: grid; grid-template-columns: 250px 1fr; min-height: calc(100vh - 50px); }
+.curator-sidebar { background: var(--s1); border-right: 1px solid var(--border); padding: 1.1rem 0.9rem; }
+.curator-profile { text-align: center; padding: 0.85rem 0 1.1rem; border-bottom: 1px solid var(--border); margin-bottom: 0.9rem; }
+.curator-avatar { width: 46px; height: 46px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 700; color: white; margin: 0 auto 0.55rem; }
+.curator-name { font-size: 0.88rem; font-weight: 600; margin-bottom: 2px; }
+.curator-handle { font-size: 0.72rem; color: var(--muted); margin-bottom: 0.7rem; }
+.curator-toggle { display: flex; align-items: center; justify-content: center; gap: 7px; background: var(--s2); border: 1px solid var(--border); border-radius: 7px; padding: 0.45rem; cursor: pointer; margin-bottom: 0.75rem; }
+.toggle-pill { width: 26px; height: 14px; background: var(--purple); border-radius: 7px; position: relative; }
+.toggle-pill::after { content: ''; width: 10px; height: 10px; background: white; border-radius: 50%; position: absolute; top: 2px; right: 2px; }
+.toggle-lbl { font-size: 0.72rem; color: var(--sub); font-weight: 600; }
+.share-row { display: flex; align-items: center; gap: 6px; background: var(--s2); border: 1px solid var(--border); border-radius: 7px; padding: 0.45rem 0.6rem; margin-bottom: 0.75rem; cursor: pointer; transition: border-color 0.12s; }
+.share-row:hover { border-color: var(--border2); }
+.share-url { font-size: 0.7rem; color: var(--muted); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.share-copy { font-size: 0.67rem; color: var(--sub); font-weight: 600; white-space: nowrap; }
+.curator-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; }
+.c-stat { background: var(--s2); border-radius: 7px; padding: 0.55rem 0.45rem; text-align: center; }
+.c-stat-num { font-size: 1rem; font-weight: 700; color: var(--text); }
+.c-stat-lbl { font-size: 0.63rem; color: var(--muted); margin-top: 1px; }
+.curator-feed { padding: 1.1rem 1.35rem; }
+.curator-card { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 0.95rem 1.05rem; margin-bottom: 0.55rem; }
+.editor-note-area { margin-top: 0.7rem; border-top: 1px solid var(--border); padding-top: 0.7rem; }
+.editor-note-label { font-size: 0.63rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 5px; }
+.editor-note-label span { color: var(--muted); }
+.editor-note-filled { background: var(--s2); border: 1px solid var(--border2); border-radius: 7px; padding: 0.5rem 0.7rem; font-size: 0.78rem; color: var(--sub); line-height: 1.5; font-style: italic; }
+.editor-note-input { width: 100%; background: var(--s2); border: 1px solid var(--border2); border-radius: 7px; padding: 0.5rem 0.7rem; color: var(--text); font-size: 0.79rem; font-family: inherit; resize: none; min-height: 58px; line-height: 1.5; transition: border-color 0.12s; }
+.editor-note-input:focus { outline: none; border-color: var(--purple); }
+.editor-note-input::placeholder { color: var(--muted); }
+.card-actions { display: flex; align-items: center; gap: 0.45rem; margin-top: 0.7rem; }
+.btn-pub { background: var(--purple); border: none; border-radius: 6px; color: white; padding: 4px 11px; font-size: 0.73rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+.btn-ghost { background: none; border: 1px solid var(--border2); border-radius: 6px; color: var(--muted); padding: 4px 11px; font-size: 0.73rem; cursor: pointer; font-family: inherit; }
+
+/* ── FONTES ── */
+.fontes-layout { max-width: 680px; margin: 0 auto; padding: 1.5rem 1.25rem; }
+.active-sources { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 1.1rem; }
+.active-title { font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 0.65rem; }
+.active-pills { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.active-pill { display: flex; align-items: center; gap: 5px; background: var(--s2); border: 1px solid var(--border2); border-radius: 20px; padding: 3px 9px; font-size: 0.71rem; color: var(--sub); }
+.active-pill .rm { color: var(--muted); cursor: pointer; font-size: 0.75rem; }
+.active-pill .rm:hover { color: var(--text); }
+.search-bar { display: flex; align-items: center; gap: 9px; background: var(--s1); border: 1px solid var(--border2); border-radius: 9px; padding: 0.6rem 0.9rem; margin-bottom: 1.25rem; }
+.search-input { background: none; border: none; color: var(--text); font-size: 0.82rem; font-family: inherit; width: 100%; }
+.search-input:focus { outline: none; }
+.search-input::placeholder { color: var(--muted); }
+.fonte-category { margin-bottom: 1.35rem; }
+.fonte-cat-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.6rem; }
+.fonte-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.45rem; }
+.fonte-item { background: var(--s1); border: 1px solid var(--border); border-radius: 9px; padding: 0.7rem 0.55rem; text-align: center; cursor: pointer; transition: all 0.12s; }
+.fonte-item:hover { border-color: var(--border2); background: var(--s2); }
+.fonte-item.active { border-color: var(--purple); background: var(--s2); }
+.fonte-icon { width: 28px; height: 28px; background: var(--s2); border-radius: 7px; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; }
+.fonte-item.active .fonte-icon { background: var(--s2); }
+.fonte-name { font-size: 0.69rem; font-weight: 500; color: var(--sub); }
+.fonte-item.active .fonte-name { color: var(--text); }
+.btn-save-config { background: var(--purple); border: none; border-radius: 7px; color: white; padding: 0.6rem 1.5rem; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; display: block; margin: 0 auto; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .digest-layout { grid-template-columns: 1fr; }
+  .sidebar, .right-sidebar { display: none; }
+  .curator-layout { grid-template-columns: 1fr; }
+  .curator-sidebar { display: none; }
+  .curadoria-layout { grid-template-columns: 1fr; }
+  .curadoria-sidebar { display: none; }
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .fonte-grid { grid-template-columns: repeat(3,1fr); }
+  .fonte-mini-grid { grid-template-columns: repeat(3,1fr); }
+}
+@media (max-width: 500px) {
+  .fonte-grid { grid-template-columns: repeat(2,1fr); }
+  .profile-cards { grid-template-columns: 1fr 1fr; }
+  nav { padding: 0 1rem; }
+  .nav-tab { padding: 0 0.65rem; font-size: 0.75rem; }
+}
+
+/* ── ONBOARDING CONTEXTO ── */
+.ob-sector-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0.45rem; margin-bottom: 0.9rem;
+}
+.ob-sector {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 9px; padding: 0.65rem 0.75rem;
+  font-size: 0.79rem; color: var(--sub);
+  cursor: pointer; transition: all 0.12s;
+}
+.ob-sector:hover { border-color: var(--border2); background: var(--s2); color: var(--text); }
+.ob-sector.selected { border-color: var(--purple); background: var(--s2); color: var(--text); }
+.ob-example-chips {
+  display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem;
+}
+.ob-chip {
+  background: var(--s2); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 3px 10px;
+  font-size: 0.69rem; color: var(--muted);
+  cursor: pointer; transition: all 0.12s;
+}
+.ob-chip:hover { color: var(--sub); border-color: var(--border2); }
+.ob-result-header {
+  display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 1rem;
+}
+.ob-result-icon {
+  width: 36px; height: 36px; background: var(--plum-dim);
+  border: 1px solid var(--plum-br); border-radius: 9px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ob-context-card {
+  background: var(--s2); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 0.1rem 0; margin-bottom: 1rem;
+}
+.ob-context-row {
+  display: flex; gap: 0.75rem; padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border); align-items: flex-start;
+}
+.ob-context-label {
+  font-size: 0.65rem; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  flex-shrink: 0; width: 90px; padding-top: 1px;
+}
+.ob-context-value {
+  font-size: 0.78rem; color: var(--sub); line-height: 1.45; flex: 1;
+}
+.ob-themes-label, .ob-sources-label {
+  font-size: 0.65rem; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 0.5rem;
+}
+.ob-themes-row {
+  display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1rem;
+}
+.ob-theme-tag {
+  background: var(--plum-dim); border: 1px solid var(--plum-br);
+  border-radius: 20px; padding: 3px 10px;
+  font-size: 0.7rem; font-weight: 600; color: var(--plum);
+}
+.ob-cockpit-note {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.71rem; color: var(--muted); margin-bottom: 1rem;
+  background: var(--s2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.75rem; line-height: 1.4;
+}
+.ob-cockpit-note strong { color: var(--sub); }
+
+/* ── LANDING PAGE ── */
+#landing-screen {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex;
+  z-index: 500;
+  overflow: hidden;
+}
+.landing-canvas {
+  position: absolute; inset: 0;
+  pointer-events: none;
+}
+.landing-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem 3.5rem 4rem 5rem;
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+}
+.landing-eyebrow {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.67rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--plum); margin-bottom: 1.75rem;
+}
+.landing-eyebrow-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--plum);
+  box-shadow: 0 0 8px var(--plum);
+}
+.landing-logo {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 2.5rem;
+}
+.landing-logo-mark {
+  width: 38px; height: 38px; background: var(--purple);
+  border-radius: 11px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 20px rgba(109,40,217,0.4);
+}
+.landing-logo-name {
+  font-size: 1.35rem; font-weight: 700; letter-spacing: -0.4px;
+}
+.landing-headline {
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 200;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 1.25rem;
+}
+.landing-headline strong {
+  font-weight: 700;
+  color: #fff;
+}
+.landing-body {
+  font-size: 0.9rem;
+  color: var(--sub);
+  line-height: 1.7;
+  max-width: 440px;
+  margin-bottom: 2.5rem;
+}
+.landing-features {
+  display: flex; flex-direction: column; gap: 0.6rem;
+  margin-bottom: 2.75rem;
+}
+.landing-feature {
+  display: flex; align-items: flex-start; gap: 0.65rem;
+  font-size: 0.8rem; color: var(--sub); line-height: 1.4;
+}
+.landing-feature-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--plum); flex-shrink: 0; margin-top: 5px;
+  box-shadow: 0 0 6px var(--plum);
+}
+.landing-social {
+  display: flex; align-items: center; gap: 0.75rem;
+  font-size: 0.72rem; color: var(--muted);
+}
+.landing-avatars {
+  display: flex;
+}
+.landing-av {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid var(--bg);
+  margin-left: -6px; display: flex; align-items: center;
+  justify-content: center; font-size: 0.58rem; font-weight: 700; color: white;
+}
+.landing-av:first-child { margin-left: 0; }
+
+/* Right panel — auth */
+.landing-right {
+  width: 380px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+}
+.landing-auth-panel {
+  width: 100%;
+  background: var(--s1);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 2rem 1.75rem;
+  box-shadow: 0 0 60px rgba(109,40,217,0.12), 0 24px 48px rgba(0,0,0,0.4);
+  position: relative;
+  overflow: hidden;
+}
+.landing-auth-panel::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--plum-br), transparent);
+}
+.landing-auth-logo {
+  display: flex; align-items: center; gap: 8px;
+  justify-content: center; margin-bottom: 0.35rem;
+}
+.landing-auth-logo-mark {
+  width: 28px; height: 28px; background: var(--purple);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+}
+.landing-auth-logo-name {
+  font-size: 1.1rem; font-weight: 700; letter-spacing: -0.3px;
+}
+.landing-auth-tagline {
+  font-size: 0.75rem; color: var(--muted); text-align: center;
+  margin-bottom: 1.75rem;
+}
+.landing-auth-title {
+  font-size: 0.95rem; font-weight: 600; text-align: center; margin-bottom: 0.3rem;
+}
+.landing-auth-sub {
+  font-size: 0.78rem; color: var(--muted); text-align: center; margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+.landing-divider {
+  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;
+}
+.landing-divider::before, .landing-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.landing-divider span { font-size: 0.68rem; color: var(--muted); }
+.landing-auth-note {
+  text-align: center; font-size: 0.72rem; color: var(--muted); margin-top: 1rem;
+  line-height: 1.5;
+}
+.landing-auth-note a { color: var(--sub); cursor: pointer; text-decoration: none; }
+.landing-auth-note a:hover { color: var(--text); }
+
+.landing-auth-preview {
+  background: var(--s2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 0.9rem 1rem; margin-bottom: 1rem;
+}
+.landing-preview-row {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-size: 0.75rem; color: var(--sub); margin-bottom: 0.5rem;
+}
+.landing-preview-row:last-child { margin-bottom: 0; }
+.landing-preview-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--plum); flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  #landing-screen { flex-direction: column; overflow-y: auto; }
+  .landing-left { padding: 3rem 2rem 2rem; max-width: 100%; }
+  .landing-right { width: 100%; padding: 0 1.5rem 3rem; }
+}
+@media (max-width: 500px) {
+  .landing-left { padding: 2rem 1.25rem 1.5rem; }
+  .landing-headline { font-size: 1.9rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast">
+  <svg width="13" height="13" color="var(--sub)" aria-hidden="true"><use href="#ic-brain"/></svg>
+  <span id="toast-msg">Aprendizado registrado</span>
+</div>
+
+<!-- ══ SVG SYMBOLS ══ -->
+<svg style="display:none">
+  <symbol id="ic-user" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <circle cx="10" cy="7" r="3.5"/><path d="M3 17c0-3.314 3.134-6 7-6s7 2.686 7 6" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-building" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="3" y="3" width="14" height="14" rx="1.5"/><path d="M7 20V10h6v10M10 7h.01M10 11h.01" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-logo" viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="2">
+    <circle cx="10" cy="10" r="4"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-mail" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="2" y="5" width="16" height="12" rx="1.5"/><path d="M2 7l8 5 8-5" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-rss" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M4 15a1 1 0 100-2 1 1 0 000 2z" fill="currentColor"/><path d="M4 9c3.314 0 6 2.686 6 6M4 4c6.075 0 11 4.925 11 11" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-signal" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M2 17c2-4 5-6 8-6s6 2 8 6M5 13c1.5-2.5 3-3.5 5-3.5s3.5 1 5 3.5M8 10V7M12 10V5" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-ph" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M10 3l2.39 4.84 5.35.78-3.87 3.77.91 5.32L10 15.27l-4.78 2.51.91-5.32L2.26 8.62l5.35-.78L10 3z" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="ic-brain" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M9 3.5C7 3.5 5 5 5 7c-1.5.5-2.5 2-2 3.5.5 1.5 2 2.5 2 4H15c0-1.5 1.5-2.5 2-4 .5-1.5-.5-3-2-3.5 0-2-2-3.5-4-3.5h-2z" stroke-linejoin="round"/>
+    <path d="M10 7v6M7.5 9h5" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-chart" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M3 17V9l4-3 4 3 4-5v13" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 17h14" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-globe" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <circle cx="10" cy="10" r="7.5"/><path d="M10 2.5c-2.5 2.5-4 5-4 7.5s1.5 5 4 7.5M10 2.5c2.5 2.5 4 5 4 7.5s-1.5 5-4 7.5M2.5 10h15" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-link" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M8 12a4 4 0 005.656 0l2-2a4 4 0 00-5.656-5.656L9 5.344M12 8a4 4 0 00-5.656 0l-2 2a4 4 0 005.656 5.656L11 14.656" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-copy" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M13 7V4.5A1.5 1.5 0 0011.5 3h-7A1.5 1.5 0 003 4.5v7A1.5 1.5 0 004.5 13H7" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M10 4v12M4 10h12" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-search" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <circle cx="8.5" cy="8.5" r="5"/><path d="M15 15l-3-3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-back" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M12 4l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="ic-ai" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M10 3l1.5 4H15l-2.75 2 1 3.5L10 10.5 6.75 12.5l1-3.5L5 7h3.5L10 3z" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="ic-robot" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="4" y="7" width="12" height="9" rx="2"/><path d="M10 4v3M7 12h.01M13 12h.01M8 15h4" stroke-linecap="round"/><path d="M7 7V5.5a3 3 0 016 0V7"/>
+  </symbol>
+  <symbol id="ic-data" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <ellipse cx="10" cy="6" rx="6" ry="2.5"/><path d="M4 6v4c0 1.38 2.686 2.5 6 2.5S16 11.38 16 10V6M4 10v4c0 1.38 2.686 2.5 6 2.5S16 15.38 16 14v-4" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-law" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M10 3v14M5 17h10" stroke-linecap="round"/><path d="M4 7l3 5M4 7l-3 5h6L4 7zM16 7l3 5M16 7l-3 5h6l-3-5z" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="ic-people" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <circle cx="8" cy="7" r="2.5"/><path d="M2 17c0-3 2.686-5 6-5 1.1 0 2.1.24 3 .66"/><circle cx="14" cy="9" r="2"/><path d="M12 17c0-2.5 2-4 4-4s4 1.5 4 4"/>
+  </symbol>
+  <symbol id="ic-lock" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="4" y="9" width="12" height="9" rx="1.5"/><path d="M7 9V6.5a3 3 0 016 0V9" stroke-linecap="round"/>
+    <circle cx="10" cy="14" r="1" fill="currentColor" stroke="none"/>
+  </symbol>
+  <symbol id="ic-note" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M14 3H6a2 2 0 00-2 2v10a2 2 0 002 2h5l5-5V5a2 2 0 00-2-2z" stroke-linejoin="round"/><path d="M14 15v-4h4" stroke-linecap="round"/><path d="M7 8h6M7 11h4" stroke-linecap="round"/>
+  </symbol>
+</svg>
+
+<!-- ══════════ LANDING ══════════ -->
+<div id="landing-screen">
+  <canvas class="landing-canvas" id="landing-canvas"></canvas>
+
+  <!-- LEFT: hero -->
+  <div class="landing-left">
+    <div class="landing-logo">
+      <div class="landing-logo-mark">
+        <svg width="20" height="20"><use href="#ic-logo"/></svg>
+      </div>
+      <div class="landing-logo-name">Lens</div>
+    </div>
+
+    <div class="landing-eyebrow">
+      <div class="landing-eyebrow-dot"></div>
+      Inteligência coletiva de mercado
+    </div>
+
+    <div class="landing-headline">
+      O seu time já sabe.<br>
+      Só falta <strong>conectar</strong><br>
+      os pontos.
+    </div>
+
+    <div class="landing-body">
+      Cada pessoa do time lê coisas diferentes. O Lens transforma esses sinais isolados em inteligência compartilhada — com conexões não-óbvias que nenhuma ferramenta de IA convencional faz.
+    </div>
+
+    <div class="landing-features">
+      <div class="landing-feature">
+        <div class="landing-feature-dot"></div>
+        <span>Digest pessoal com scoring de IA e conexões latentes ao seu contexto</span>
+      </div>
+      <div class="landing-feature">
+        <div class="landing-feature-dot"></div>
+        <span>Overlap de equipe — o que 2+ pessoas sinalizaram vira inteligência coletiva</span>
+      </div>
+      <div class="landing-feature">
+        <div class="landing-feature-dot"></div>
+        <span>Memória de equipe acumulada que cresce a cada edição</span>
+      </div>
+    </div>
+
+    <div class="landing-social">
+      <div class="landing-avatars">
+        <div class="landing-av" style="background:#6d28d9">B</div>
+        <div class="landing-av" style="background:#7c3aed">M</div>
+        <div class="landing-av" style="background:#4c1d95">A</div>
+      </div>
+      Usado por advisors e times de produto
+    </div>
+  </div>
+
+  <!-- RIGHT: auth panel -->
+  <div class="landing-right">
+    <div class="landing-auth-panel">
+      <div class="landing-auth-logo">
+        <div class="landing-auth-logo-mark">
+          <svg width="14" height="14"><use href="#ic-logo"/></svg>
+        </div>
+        <div class="landing-auth-logo-name">Lens</div>
+      </div>
+      <div class="landing-auth-tagline">Inteligência de mercado que evolui com o seu time</div>
+
+      <div class="landing-auth-preview">
+        <div class="landing-preview-row">
+          <div class="landing-preview-dot"></div>
+          <span>Digest com scoring de relevância por IA</span>
+        </div>
+        <div class="landing-preview-row">
+          <div class="landing-preview-dot"></div>
+          <span>Conexões latentes ao seu contexto de trabalho</span>
+        </div>
+        <div class="landing-preview-row">
+          <div class="landing-preview-dot"></div>
+          <span>Overlap e inteligência coletiva de equipe</span>
+        </div>
+      </div>
+
+      <button class="btn-primary" style="border-radius:24px;margin-bottom:0.75rem" onclick="landingToAuth('profile')">Criar conta — é grátis</button>
+
+      <div class="landing-divider"><span>ou</span></div>
+
+      <button class="btn-google" onclick="landingToAuth('login')">
+        <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Entrar com Google
+      </button>
+
+      <div class="landing-auth-note">
+        Já tem conta? <a onclick="landingToAuth('login')">Entrar com e-mail</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ AUTH ══════════ -->
+<div id="auth-screen" class="auth-wrap" style="display:none">
+  <div class="auth-box">
+
+    <div class="auth-logo">
+      <div class="auth-logo-mark">
+        <svg width="18" height="18"><use href="#ic-logo"/></svg>
+      </div>
+      <div class="auth-logo-name">Lens</div>
+    </div>
+    <div class="auth-tagline">Inteligência de mercado que evolui com o seu time</div>
+
+    <!-- LANDING -->
+    <div id="step-landing">
+      <div class="auth-landing-title">Boas-vindas ao Lens</div>
+      <div class="auth-landing-sub" style="margin-bottom:1.25rem">Seu digest de mercado com inteligência coletiva</div>
+      <button class="btn-primary" onclick="goToProfile()">Criar conta</button>
+      <div class="auth-link"><a onclick="goToLogin()">Já tenho conta — Entrar</a></div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="step-login" style="display:none">
+      <button class="back-btn" onclick="goToLanding()">
+        <svg width="14" height="14"><use href="#ic-back"/></svg> Voltar
+      </button>
+      <div style="font-size:0.95rem;font-weight:600;margin-bottom:0.25rem">Entrar no Lens</div>
+      <div class="auth-link" style="text-align:left;margin-bottom:1.1rem">Não tem conta? <a onclick="goToProfile()">Criar conta</a></div>
+      <button class="btn-google" onclick="goToLoginProfile()">
+        <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Entrar com Google
+      </button>
+      <div class="divider"><span>ou entre com e-mail</span></div>
+      <div class="form-field"><label class="form-label" for="login-email">E-mail</label><input id="login-email" class="form-input" type="email" placeholder="seu@email.com"></div>
+      <div class="form-field"><label class="form-label" for="login-password">Senha</label><input id="login-password" class="form-input" type="password" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="goToLoginWithEmail()" style="margin-top:0.25rem">Entrar</button>
+    </div>
+
+    <!-- LOGIN — SELEÇÃO DE PERFIL (usuário já cadastrado) -->
+    <div id="step-login-profile" style="display:none">
+      <button class="back-btn" onclick="goToLogin()">
+        <svg width="14" height="14"><use href="#ic-back"/></svg> Voltar
+      </button>
+      <div style="font-size:0.95rem;font-weight:600;margin-bottom:0.25rem">Qual é o seu perfil?</div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-bottom:1.1rem">Selecione para entrar na sua conta</div>
+      <div class="profile-cards" style="grid-template-columns:1fr 1fr;margin-bottom:0">
+
+        <div class="profile-card" onclick="enterApp('pf_basic')">
+          <div class="profile-card-icon">
+            <svg width="16" height="16" color="var(--sub)"><use href="#ic-user"/></svg>
+          </div>
+          <div class="profile-card-title">Pessoa física</div>
+          <div class="profile-card-desc">Digest pessoal com curadoria de IA</div>
+          <div class="profile-plan-badge free">Grátis</div>
+        </div>
+
+        <div class="profile-card" onclick="enterApp('pf_curator')">
+          <div class="profile-card-icon">
+            <svg width="16" height="16" color="var(--sub)"><use href="#ic-note"/></svg>
+          </div>
+          <div class="profile-card-title">PF Curador</div>
+          <div class="profile-card-desc">Digest + banco de referências + publicação</div>
+          <div class="profile-plan-badge paid">Curador · R$59/mês</div>
+        </div>
+
+        <div class="profile-card" onclick="enterApp('pj_admin')">
+          <div class="profile-card-icon">
+            <svg width="16" height="16" color="var(--sub)"><use href="#ic-building"/></svg>
+          </div>
+          <div class="profile-card-title">Empresa — Admin</div>
+          <div class="profile-card-desc">Gestão de time, painel do gestor e fontes</div>
+          <div class="profile-plan-badge paid">Pro · R$49/mês por usuário</div>
+        </div>
+
+        <div class="profile-card" onclick="enterApp('pj_member')">
+          <div class="profile-card-icon">
+            <svg width="16" height="16" color="var(--sub)"><use href="#ic-people"/></svg>
+          </div>
+          <div class="profile-card-title">Empresa — Membro</div>
+          <div class="profile-card-desc">Digest individual + visão da equipe</div>
+          <div class="profile-plan-badge free">Grátis</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PERFIL -->
+    <div id="step-profile" style="display:none">
+      <button class="back-btn" onclick="goToLanding()">
+        <svg width="14" height="14"><use href="#ic-back"/></svg> Voltar
+      </button>
+      <div style="font-size:0.95rem;font-weight:600;margin-bottom:0.25rem">Como você vai usar o Lens?</div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-bottom:1.1rem">Isso define as funcionalidades da sua conta</div>
+      <div class="profile-cards" style="grid-template-columns:1fr 1fr">
+
+        <div class="profile-card" id="card-pf_basic" onclick="selectProfile('pf_basic')">
+          <div class="profile-card-icon">
+            <svg width="16" height="16" color="var(--sub)"><use href="#ic-user"/></svg>
+          </div>
+          <div class="profile-card-title">Pessoa física</div>
+          <div class="profile-card-desc">Digest pessoal com curadoria de IA</div>
+          <div class="profile-plan-badge free">Grátis</div>
+          <button class="profile-explore-btn" onclick="event.stopPropagation(); enterAppDemo('pf_basic')">Explorar →</button>
+        </div>
+
+        <div class="profile-card" id="card-pf_curator" onclick="selectProfile('pf_curator')">
+          <div class="profile-card-icon">
+            <svg width="16" height="16" color="var(--sub)"><use href="#ic-note"/></svg>
+          </div>
+          <div class="profile-card-title">PF Curador</div>
+          <div class="profile-card-desc">Digest + banco de referências + publicação</div>
+          <div class="profile-plan-badge paid">Curador · R$59/mês</div>
+          <button class="profile-explore-btn" onclick="event.stopPropagation(); enterAppDemo('pf_curator')">Explorar →</button>
+        </div>
+
+        <div class="profile-card" id="card-pj_admin" onclick="selectProfile('pj_admin')">
+          <div class="profile-card-icon">
+            <svg width="16" height="16" color="var(--sub)"><use href="#ic-building"/></svg>
+          </div>
+          <div class="profile-card-title">Empresa — Admin</div>
+          <div class="profile-card-desc">Gestão de time, painel do gestor e fontes</div>
+          <div class="profile-plan-badge paid">Pro · R$49/mês por usuário</div>
+          <button class="profile-explore-btn" onclick="event.stopPropagation(); enterAppDemo('pj_admin')">Explorar →</button>
+        </div>
+
+        <div class="profile-card" id="card-pj_member" onclick="selectProfile('pj_member')">
+          <div class="profile-card-icon">
+            <svg width="16" height="16" color="var(--sub)"><use href="#ic-people"/></svg>
+          </div>
+          <div class="profile-card-title">Empresa — Membro</div>
+          <div class="profile-card-desc">Digest individual + visão da equipe</div>
+          <div class="profile-plan-badge free">Grátis</div>
+          <button class="profile-explore-btn" onclick="event.stopPropagation(); enterAppDemo('pj_member')">Explorar →</button>
+        </div>
+
+      </div>
+      <button class="btn-primary" id="btn-next" onclick="goToForm()" disabled style="margin-top:0.25rem">Continuar com cadastro</button>
+    </div>
+
+    <!-- FORM CADASTRO -->
+    <div id="step-form" style="display:none">
+      <button class="back-btn" onclick="goToProfile()">
+        <svg width="14" height="14"><use href="#ic-back"/></svg> Voltar
+      </button>
+      <div style="font-size:0.95rem;font-weight:600;margin-bottom:0.25rem">Criar sua conta</div>
+      <div class="auth-link" style="text-align:left;margin-bottom:0.9rem">Já tem conta? <a onclick="goToLogin()">Entrar</a></div>
+      <div class="form-badge" id="form-badge">
+        <svg width="12" height="12" color="var(--sub)"><use href="#ic-user"/></svg>
+        Pessoa física
+      </div>
+      <button class="btn-google" onclick="goToOnboard()">
+        <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Cadastrar com Google
+      </button>
+      <div class="divider"><span>ou cadastre-se com e-mail</span></div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Nome</label><input class="form-input" type="text" placeholder="Bruno"></div>
+        <div class="form-field"><label class="form-label">Sobrenome</label><input class="form-input" type="text" placeholder="Gentil"></div>
+      </div>
+      <div class="form-field"><label class="form-label">E-mail</label><input class="form-input" type="email" placeholder="bruno@empresa.com"></div>
+      <div id="pj-fields" style="display:none">
+        <div class="form-field"><label class="form-label">Empresa</label><input class="form-input" type="text" placeholder="Platform Builders"></div>
+        <div class="form-field">
+          <label class="form-label">Tamanho do time</label>
+          <select class="form-input" style="cursor:pointer">
+            <option value="" disabled selected>Selecione</option>
+            <option>2–5 pessoas</option><option>6–15 pessoas</option>
+            <option>16–50 pessoas</option><option>50+ pessoas</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-field"><label class="form-label">Senha</label><input class="form-input" type="password" placeholder="Mínimo 8 caracteres"></div>
+      <button class="btn-primary" onclick="goToOnboard()" style="margin-top:0.25rem">Criar conta</button>
+      <div class="form-footer">Ao criar conta você concorda com os <a href="#">Termos</a> e <a href="#">Privacidade</a></div>
+    </div>
+
+    <!-- ONBOARD — FONTES -->
+    <div id="step-onboard" style="display:none">
+
+      <!-- progresso -->
+      <div class="onboard-progress">
+        <div class="onboard-step"><div class="onboard-dot done">✓</div><div class="onboard-label">Perfil</div></div>
+        <div class="onboard-line"></div>
+        <div class="onboard-step"><div class="onboard-dot active" id="ob-dot-2">2</div><div class="onboard-label active" id="ob-lbl-2">Contexto</div></div>
+        <div class="onboard-line"></div>
+        <div class="onboard-step"><div class="onboard-dot pending" id="ob-dot-3">3</div><div class="onboard-label" id="ob-lbl-3">Digest</div></div>
+      </div>
+
+      <!-- ── SUB-STEP 1: setor ── -->
+      <div id="ob-q1">
+        <div class="onboard-title">Em que setor você atua?</div>
+        <div class="onboard-sub">O Lens vai calibrar o que é relevante para o seu contexto</div>
+        <div class="ob-sector-grid">
+          <div class="ob-sector" onclick="obSelectSector(this,'Tecnologia & Produto')">
+            <svg width="15" height="15" color="var(--sub)"><use href="#ic-ai"/></svg> Tecnologia & Produto
+          </div>
+          <div class="ob-sector" onclick="obSelectSector(this,'Saúde & Biotech')">
+            <svg width="15" height="15" color="var(--sub)"><use href="#ic-brain"/></svg> Saúde & Biotech
+          </div>
+          <div class="ob-sector" onclick="obSelectSector(this,'Varejo & Consumo')">
+            <svg width="15" height="15" color="var(--sub)"><use href="#ic-globe"/></svg> Varejo & Consumo
+          </div>
+          <div class="ob-sector" onclick="obSelectSector(this,'Financeiro & Fintechs')">
+            <svg width="15" height="15" color="var(--sub)"><use href="#ic-chart"/></svg> Financeiro & Fintechs
+          </div>
+          <div class="ob-sector" onclick="obSelectSector(this,'Educação & RH')">
+            <svg width="15" height="15" color="var(--sub)"><use href="#ic-people"/></svg> Educação & RH
+          </div>
+          <div class="ob-sector" onclick="obSelectSector(this,'Consultoria & Advisory')">
+            <svg width="15" height="15" color="var(--sub)"><use href="#ic-note"/></svg> Consultoria & Advisory
+          </div>
+        </div>
+        <div style="margin-bottom:0.65rem">
+          <div class="form-label" style="margin-bottom:4px">Outro setor</div>
+          <input class="form-input" id="ob-sector-other" placeholder="ex: Agro, Energia, Logística…" oninput="obClearSector()" />
+        </div>
+        <button class="btn-primary" id="ob-btn-1" onclick="obNextQ(1)" disabled>Continuar</button>
+      </div>
+
+      <!-- ── SUB-STEP 2: decisão ── -->
+      <div id="ob-q2" style="display:none">
+        <div class="onboard-title">Qual decisão você está tentando tomar nos próximos 90 dias?</div>
+        <div class="onboard-sub">Pode ser vaga — o que importa é a direção, não a precisão</div>
+        <div class="ob-example-chips">
+          <span class="ob-chip" onclick="obFillDecision(this)">Entender para onde vai meu setor</span>
+          <span class="ob-chip" onclick="obFillDecision(this)">Identificar oportunidades de produto</span>
+          <span class="ob-chip" onclick="obFillDecision(this)">Avaliar novas tecnologias para adotar</span>
+          <span class="ob-chip" onclick="obFillDecision(this)">Preparar uma estratégia de crescimento</span>
+        </div>
+        <textarea class="form-input" id="ob-decision" rows="3" placeholder="Descreva com suas palavras…" style="resize:none;line-height:1.55" oninput="obCheckQ2()"></textarea>
+        <div style="display:flex;gap:0.5rem;margin-top:0.75rem">
+          <button class="btn-skip" style="flex:0 0 auto;width:auto;padding:0.55rem 1rem" onclick="obGoBack(2)">← Voltar</button>
+          <button class="btn-primary" id="ob-btn-2" onclick="obNextQ(2)" disabled style="flex:1">Continuar</button>
+        </div>
+      </div>
+
+      <!-- ── SUB-STEP 3: ponto cego ── -->
+      <div id="ob-q3" style="display:none">
+        <div class="onboard-title">O que você precisa parar de ignorar?</div>
+        <div class="onboard-sub">Temas que você sabe que importam mas nunca tem tempo de acompanhar</div>
+        <div class="ob-example-chips">
+          <span class="ob-chip" onclick="obFillBlind(this)">Regulação e compliance do setor</span>
+          <span class="ob-chip" onclick="obFillBlind(this)">Movimentos da concorrência</span>
+          <span class="ob-chip" onclick="obFillBlind(this)">Tecnologia emergente aplicada ao negócio</span>
+          <span class="ob-chip" onclick="obFillBlind(this)">Comportamento do consumidor</span>
+        </div>
+        <textarea class="form-input" id="ob-blind" rows="3" placeholder="Descreva com suas palavras…" style="resize:none;line-height:1.55" oninput="obCheckQ3()"></textarea>
+        <div style="display:flex;gap:0.5rem;margin-top:0.75rem">
+          <button class="btn-skip" style="flex:0 0 auto;width:auto;padding:0.55rem 1rem" onclick="obGoBack(3)">← Voltar</button>
+          <button class="btn-primary" id="ob-btn-3" onclick="obBuildContext()" disabled style="flex:1">Montar meu contexto</button>
+        </div>
+      </div>
+
+      <!-- ── SUB-STEP 4: resultado do contexto ── -->
+      <div id="ob-result" style="display:none">
+        <div class="ob-result-header">
+          <div class="ob-result-icon">
+            <svg width="18" height="18" color="var(--plum)"><use href="#ic-brain"/></svg>
+          </div>
+          <div>
+            <div class="onboard-title" style="margin-bottom:2px">Isso é o que o Lens entendeu</div>
+            <div class="onboard-sub" style="margin-bottom:0">Você pode ajustar a qualquer momento</div>
+          </div>
+        </div>
+
+        <div class="ob-context-card">
+          <div class="ob-context-row">
+            <span class="ob-context-label">Setor</span>
+            <span class="ob-context-value" id="res-sector">—</span>
+          </div>
+          <div class="ob-context-row">
+            <span class="ob-context-label">Decisão em curso</span>
+            <span class="ob-context-value" id="res-decision">—</span>
+          </div>
+          <div class="ob-context-row" style="border:none;padding-bottom:0">
+            <span class="ob-context-label">Ponto cego</span>
+            <span class="ob-context-value" id="res-blind">—</span>
+          </div>
+        </div>
+
+        <div class="ob-themes-label">Temas que o Lens vai priorizar no seu digest</div>
+        <div class="ob-themes-row" id="res-themes"></div>
+
+        <div class="ob-sources-label">Fontes que o Lens vai monitorar para você</div>
+        <div class="fonte-mini-grid" id="res-sources" style="margin-bottom:1.25rem"></div>
+
+        <div class="ob-cockpit-note">
+          <svg width="12" height="12" color="var(--muted)"><use href="#ic-signal"/></svg>
+          Você também pode adicionar fontes manualmente em <strong>Fontes</strong> quando quiser.
+        </div>
+
+        <button class="btn-primary" onclick="enterApp(currentProfile)">Gerar meu primeiro digest</button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ NAV ══════════ -->
+<nav id="main-nav" style="display:none">
+  <div class="logo">
+    <div class="logo-mark"><svg width="14" height="14"><use href="#ic-logo"/></svg></div>
+    Lens
+  </div>
+  <div class="nav-tabs" id="nav-tabs"></div>
+  <div class="nav-right">
+    <span class="pill" id="demo-pill" style="display:none;background:rgba(109,40,217,0.18);border-color:rgba(139,92,246,0.4);color:var(--plum)">Demo</span>
+    <span class="pill" id="nav-pill">Pessoal</span>
+    <div class="avatar">BG</div>
+  </div>
+</nav>
+
+<!-- ══════════ INDIVIDUAL ══════════ -->
+<div class="view" id="view-individual">
+  <div class="digest-layout">
+    <div class="sidebar">
+      <div class="sidebar-title">Salvos esta semana</div>
+      <div id="sidebar-saved">
+        <div class="empty-state" style="min-height:120px;padding:1rem">
+          <div style="font-size:0.75rem;color:var(--muted);text-align:center;line-height:1.5">Itens salvos<br>aparecerão aqui</div>
+        </div>
+      </div>
+      <div class="saved-count" id="saved-count-widget" style="display:none">
+        <div class="saved-count-num" id="saved-count-num">0</div>
+        <div class="saved-count-lbl">itens salvos</div>
+      </div>
+    </div>
+    <div class="feed" id="feed-content">
+      <!-- preenchido pelo JS: empty state ou cards -->
+    </div>
+    <div class="right-sidebar">
+      <div class="widget">
+        <div class="widget-title">Score por fonte</div>
+        <div class="bar-row"><div class="bar-lbl">a16z</div><div class="bar-wrap"><div class="bar-fill" style="width:91%"></div></div><div class="bar-num">91</div></div>
+        <div class="bar-row"><div class="bar-lbl">Noema</div><div class="bar-wrap"><div class="bar-fill" style="width:89%"></div></div><div class="bar-num">89</div></div>
+        <div class="bar-row"><div class="bar-lbl">CB Insights</div><div class="bar-wrap"><div class="bar-fill" style="width:88%"></div></div><div class="bar-num">88</div></div>
+        <div class="bar-row"><div class="bar-lbl">Every.to</div><div class="bar-wrap"><div class="bar-fill" style="width:85%"></div></div><div class="bar-num">85</div></div>
+      </div>
+      <div class="widget">
+        <div class="widget-title">Temas desta semana</div>
+        <div class="bar-row"><div class="bar-lbl">IA aplicada</div><div class="bar-wrap"><div class="bar-fill" style="width:100%"></div></div><div class="bar-num">4</div></div>
+        <div class="bar-row"><div class="bar-lbl">Governança</div><div class="bar-wrap"><div class="bar-fill" style="width:50%"></div></div><div class="bar-num">2</div></div>
+        <div class="bar-row"><div class="bar-lbl">Regulação</div><div class="bar-wrap"><div class="bar-fill" style="width:25%"></div></div><div class="bar-num">1</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PÁGINA PÚBLICA DO CURADOR ══════════ -->
+<div class="view" id="view-public">
+  <div class="public-wrap">
+    <div class="public-nav">
+      <div class="public-nav-logo">
+        <div class="public-nav-mark"><svg width="14" height="14"><use href="#ic-logo"/></svg></div>
+        Lens
+      </div>
+      <div class="public-nav-cta">
+        <button class="btn-sm-ghost" onclick="show('curator')">← Voltar ao app</button>
+        <button class="btn-sm" onclick="createPublicPage()">Criar minha página</button>
+      </div>
+    </div>
+
+    <div class="public-hero">
+      <div class="public-curator-card">
+        <div class="public-curator-avatar">BG</div>
+        <div>
+          <div class="public-curator-name">Bruno Gentil</div>
+          <div class="public-curator-handle">lens.ai/c/brunogentil</div>
+          <div class="public-curator-stats">
+            <div class="public-stat"><strong>34</strong> assinantes</div>
+            <div class="public-stat"><strong>8</strong> edições</div>
+            <div class="public-stat"><strong>91%</strong> taxa de abertura</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="public-bio">
+        Senior Business Advisor em plataforma de inovação. Curo semanalmente os sinais mais relevantes sobre transformação digital B2B, adoção de IA em empresas e liderança de produto — com conexões que o mainstream ainda não está vendo.
+      </div>
+
+      <div class="subscribe-box">
+        <div class="subscribe-title">Receber o digest de Bruno Gentil</div>
+        <div class="subscribe-sub">Toda semana, direto no seu e-mail. Gratuito.</div>
+        <div class="subscribe-row">
+          <input class="subscribe-input" id="subscribe-email" type="email" placeholder="seu@email.com">
+          <button class="btn-sm" onclick="subscribeDemo(this)">Assinar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="public-editions">
+      <div class="section-label" style="margin-top:0">Últimas edições</div>
+
+      <div class="public-edition">
+        <div class="public-edition-header">
+          <div class="public-edition-num">Edição #8</div>
+          <div class="public-edition-title">IA como infraestrutura de decisão, não de automação</div>
+          <div class="public-edition-date">08 jun</div>
+        </div>
+        <div class="public-edition-preview">
+          Esta semana, dois sinais independentes convergiram para a mesma conclusão: empresas que tratam IA como infraestrutura de tomada de decisão — não como automação de tarefas — têm performance operacional consistentemente superior.
+        </div>
+        <div class="public-edition-note">
+          O que me chamou atenção foi a inversão de lógica. A maioria das empresas ainda compra IA para fazer coisas mais rápido. As que estão ganhando estão usando IA para decidir melhor. São orçamentos diferentes, times responsáveis diferentes, métricas de sucesso diferentes.
+        </div>
+      </div>
+
+      <div class="public-edition">
+        <div class="public-edition-header">
+          <div class="public-edition-num">Edição #7</div>
+          <div class="public-edition-title">O ritual que falta nos times que adotam IA</div>
+          <div class="public-edition-date">05 jun</div>
+        </div>
+        <div class="public-edition-preview">
+          Times que adotam IA com sucesso têm uma coisa em comum: pelo menos um momento semanal onde IA entra no fluxo coletivo — não individual.
+        </div>
+        <div class="public-edition-note">
+          Já vi isso em clientes: quando IA é só individual, vira produtividade pessoal. Quando tem um ritual coletivo — mesmo que simples — vira cultura. A diferença de impacto é enorme.
+        </div>
+      </div>
+
+      <!-- edição bloqueada para não assinante -->
+      <div class="public-locked-edition">
+        <svg width="14" height="14" color="var(--muted)"><use href="#ic-lock"/></svg>
+        <div class="public-locked-text">
+          Edição #6 · 03 jun — <a onclick="subscribeDemo()">Assine para ler todas as edições</a>
+        </div>
+      </div>
+      <div class="public-locked-edition">
+        <svg width="14" height="14" color="var(--muted)"><use href="#ic-lock"/></svg>
+        <div class="public-locked-text">
+          Edição #5 · 29 mai — <a onclick="subscribeDemo()">Assine para ler todas as edições</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PLANOS ══════════ -->
+<div class="view" id="view-plans">
+  <div class="plans-wrap">
+    <div class="plans-header">
+      <div class="plans-title">Escolha o seu plano</div>
+      <div class="plans-sub">Comece grátis. Faça upgrade quando precisar de mais.</div>
+      <div class="plans-toggle">
+        <div class="toggle-option active" id="toggle-monthly">Mensal</div>
+        <div class="toggle-switch" id="billing-toggle" onclick="toggleBilling()"></div>
+        <div class="toggle-option" id="toggle-yearly">Anual <span style="color:var(--sub);font-weight:700">−20%</span></div>
+      </div>
+    </div>
+
+    <div class="segment-tabs">
+      <div class="segment-tab active" onclick="switchSegment(this,'pf')">Pessoa física</div>
+      <div class="segment-tab" onclick="switchSegment(this,'pj')">Empresa</div>
+    </div>
+
+    <!-- PLANOS PF -->
+    <div id="plans-pf">
+      <div class="plans-grid">
+
+        <div class="plan-card">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">R$ 0<span>/mês</span></div>
+          <div class="plan-desc">Para quem quer experimentar o digest com curadoria de IA</div>
+          <button class="plan-btn plan-btn-ghost" onclick="show('individual')">Plano atual</button>
+          <ul class="plan-features">
+            <li class="plan-feature"><span class="check">✓</span> Meu Digest (até 5 cards)</li>
+            <li class="plan-feature"><span class="check">✓</span> Até 4 fontes conectadas</li>
+            <li class="plan-feature"><span class="check">✓</span> Score Claude por card</li>
+            <li class="plan-feature"><span class="cross">—</span> Histórico de edições</li>
+            <li class="plan-feature"><span class="cross">—</span> Painel de progresso</li>
+            <li class="plan-feature"><span class="cross">—</span> Sinais antecipados</li>
+          </ul>
+        </div>
+
+        <div class="plan-card featured">
+          <div class="plan-badge">Mais popular</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price" id="pf-pro-price">R$ 29<span>/mês</span></div>
+          <div class="plan-desc">Digest completo com histórico e painel de progresso</div>
+          <button class="plan-btn plan-btn-primary" onclick="showPlanCTA('Pro PF')">Assinar Pro</button>
+          <ul class="plan-features">
+            <li class="plan-feature"><span class="check">✓</span> Tudo do Free</li>
+            <li class="plan-feature"><span class="check">✓</span> Digest ilimitado (todos os cards)</li>
+            <li class="plan-feature"><span class="check">✓</span> Fontes ilimitadas</li>
+            <li class="plan-feature"><span class="check">✓</span> Histórico completo</li>
+            <li class="plan-feature"><span class="check">✓</span> Painel de progresso</li>
+            <li class="plan-feature"><span class="check">✓</span> Sinais antecipados</li>
+          </ul>
+        </div>
+
+        <div class="plan-card">
+          <div class="plan-name">Curator</div>
+          <div class="plan-price" id="pf-curator-price">R$ 59<span>/mês</span></div>
+          <div class="plan-desc">Para quem quer construir audiência distribuindo seus insights</div>
+          <button class="plan-btn plan-btn-primary" onclick="showPlanCTA('Curator')">Assinar Curator</button>
+          <ul class="plan-features">
+            <li class="plan-feature"><span class="check">✓</span> Tudo do Pro</li>
+            <li class="plan-feature"><span class="check">✓</span> Minha Curadoria (banco de referências)</li>
+            <li class="plan-feature"><span class="check">✓</span> Página pública do curador</li>
+            <li class="plan-feature"><span class="check">✓</span> Assinantes ilimitados</li>
+            <li class="plan-feature"><span class="check">✓</span> Conexões IA entre banco e digest</li>
+            <li class="plan-feature"><span class="check">✓</span> Analytics de abertura</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PLANOS PJ -->
+    <div id="plans-pj" style="display:none">
+      <div class="plans-grid">
+
+        <div class="plan-card">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">R$ 0<span>/mês</span></div>
+          <div class="plan-desc">Para times pequenos que querem experimentar o digest coletivo</div>
+          <button class="plan-btn plan-btn-ghost">Plano atual</button>
+          <ul class="plan-features">
+            <li class="plan-feature"><span class="check">✓</span> Até 3 membros</li>
+            <li class="plan-feature"><span class="check">✓</span> Meu Digest individual</li>
+            <li class="plan-feature"><span class="check">✓</span> Visão da Equipe (overlaps)</li>
+            <li class="plan-feature"><span class="cross">—</span> Painel do Gestor</li>
+            <li class="plan-feature"><span class="cross">—</span> Histórico de edições</li>
+            <li class="plan-feature"><span class="cross">—</span> Painel de progresso</li>
+          </ul>
+        </div>
+
+        <div class="plan-card featured">
+          <div class="plan-badge">Recomendado</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price" id="pj-pro-price">R$ 49<span>/membro/mês</span></div>
+          <div class="plan-desc">Inteligência coletiva completa para o time</div>
+          <button class="plan-btn plan-btn-primary" onclick="showPlanCTA('Pro PJ')">Assinar Pro</button>
+          <ul class="plan-features">
+            <li class="plan-feature"><span class="check">✓</span> Membros ilimitados</li>
+            <li class="plan-feature"><span class="check">✓</span> Tudo do Free</li>
+            <li class="plan-feature"><span class="check">✓</span> Painel do Gestor completo</li>
+            <li class="plan-feature"><span class="check">✓</span> Histórico de edições</li>
+            <li class="plan-feature"><span class="check">✓</span> Painel de progresso da equipe</li>
+            <li class="plan-feature"><span class="check">✓</span> Sinal da semana agregado</li>
+          </ul>
+        </div>
+
+        <div class="plan-card">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price" style="font-size:1.4rem">Custom</div>
+          <div class="plan-desc">Para BUs e empresas com múltiplos times e necessidades específicas</div>
+          <button class="plan-btn plan-btn-ghost" onclick="showPlanCTA('Enterprise')">Falar com time</button>
+          <ul class="plan-features">
+            <li class="plan-feature"><span class="check">✓</span> Tudo do Pro</li>
+            <li class="plan-feature"><span class="check">✓</span> Múltiplos times / BUs</li>
+            <li class="plan-feature"><span class="check">✓</span> SSO corporativo</li>
+            <li class="plan-feature"><span class="check">✓</span> Integrações Slack / Teams</li>
+            <li class="plan-feature"><span class="check">✓</span> Suporte dedicado</li>
+            <li class="plan-feature"><span class="check">✓</span> SLA garantido</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="plan-divider">
+
+    <div class="plans-faq">
+      <div class="faq-title">Perguntas frequentes</div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Posso cancelar a qualquer momento? <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">Sim. Não há fidelidade. Ao cancelar, você mantém acesso até o fim do período pago e volta automaticamente para o plano Free.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">O que acontece com meu histórico se eu cancelar? <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">Seu histórico fica salvo. Você perde o acesso à visualização no app, mas pode reativar a qualquer momento e tudo volta exatamente onde estava.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Como funciona o plano PJ por membro? <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">Você paga por membro ativo no mês. Membros convidados que não ativaram a conta não são cobrados. O admin gerencia o time e vê o total na fatura.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">O Curator pode monetizar o digest? <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">Monetização de assinantes está no roadmap. Por ora, o Curator é gratuito para assinantes — o valor está em construir audiência e autoridade.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ LOCKED ══════════ -->
+<div class="view" id="view-locked">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 50px);padding:2rem">
+    <div style="text-align:center;max-width:320px">
+      <div class="lock-icon" style="margin:0 auto 1rem">
+        <svg width="18" height="18" color="var(--muted)"><use href="#ic-lock"/></svg>
+      </div>
+      <div class="lock-title" style="font-size:1rem;font-weight:600;margin-bottom:0.35rem">Recurso Premium</div>
+      <div class="lock-sub" style="font-size:0.8rem;color:var(--muted);margin-bottom:1.1rem;line-height:1.5">
+        Esta funcionalidade está disponível no plano Pro. Faça upgrade para desbloquear histórico completo, painel de progresso e modo curador.
+      </div>
+      <button class="btn-upgrade" style="margin-bottom:0.75rem" onclick="show('plans')">Ver planos</button>
+      <div style="font-size:0.72rem;color:var(--muted)">ou <a style="color:var(--sub);cursor:pointer" onclick="show('individual')">voltar ao digest</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MINHA CURADORIA ══════════ -->
+<div class="view" id="view-curadoria">
+  <div class="curadoria-layout">
+
+    <div class="curadoria-main">
+      <div class="feed-header" style="margin-bottom:1rem">
+        <div class="feed-title">Minha Curadoria</div>
+        <div class="feed-meta" id="bank-count-header">14 referências no banco</div>
+      </div>
+
+      <!-- captura rápida -->
+      <div class="capture-bar">
+        <textarea class="capture-input" id="capture-input" rows="2"
+          placeholder="Cole uma URL, escreva uma citação ou registre um pensamento..."></textarea>
+        <div class="capture-actions">
+          <div class="capture-tag-row">
+            <span class="capture-tag-opt" onclick="this.classList.toggle('sel')">Referência</span>
+            <span class="capture-tag-opt" onclick="this.classList.toggle('sel')">Análise</span>
+            <span class="capture-tag-opt" onclick="this.classList.toggle('sel')">Dado</span>
+            <span class="capture-tag-opt" onclick="this.classList.toggle('sel')">Caso</span>
+          </div>
+          <button class="btn-capture" onclick="captureRef()">Salvar</button>
+        </div>
+      </div>
+
+      <!-- filtros -->
+      <div class="filter-row">
+        <div class="filter-chip active" onclick="filterBank(this,'all')">Todos</div>
+        <div class="filter-chip" onclick="filterBank(this,'connected')">Conectados ao digest</div>
+        <div class="filter-chip" onclick="filterBank(this,'ref')">Referência</div>
+        <div class="filter-chip" onclick="filterBank(this,'analysis')">Análise</div>
+        <div class="filter-chip" onclick="filterBank(this,'data')">Dado</div>
+      </div>
+
+      <!-- banco de referências -->
+      <div id="ref-bank">
+
+        <!-- item com conexão ativa -->
+        <div class="ref-item connected">
+          <div class="ref-header">
+            <div class="ref-type"><svg width="12" height="12" color="var(--sub)"><use href="#ic-link"/></svg></div>
+            <div class="ref-title">McKinsey: empresas que tratam IA como infraestrutura têm margem operacional 18% superior</div>
+            <div class="ref-date">02 jun</div>
+          </div>
+          <div class="ref-note">O dado que mais me chamou atenção: a diferença não está na quantidade de ferramentas mas em onde a IA se encaixa na estrutura de decisão. Infraestrutura vs. automação pontual.</div>
+          <div class="ref-connection">
+            <div class="ref-connection-label">Conexão com digest desta semana</div>
+            <div class="ref-connection-text">Este dado reforça o insight da a16z sobre IA como camada de coordenação — são duas fontes independentes chegando à mesma conclusão com 3 semanas de diferença.</div>
+          </div>
+          <div class="ref-footer">
+            <span class="tag">Dado</span><span class="tag">IA aplicada</span>
+            <button class="btn-use" style="margin-left:auto">Usar na edição</button>
+          </div>
+        </div>
+
+        <!-- item sem conexão -->
+        <div class="ref-item">
+          <div class="ref-header">
+            <div class="ref-type"><svg width="12" height="12" color="var(--sub)"><use href="#ic-note"/></svg></div>
+            <div class="ref-title">Conversa com cliente Assaí: dificuldade de escalar squads sem camada de governança clara</div>
+            <div class="ref-date">30 mai</div>
+          </div>
+          <div class="ref-note">O cliente relatou que o problema não era falta de tecnologia mas ausência de ownership claro por domínio. Cada squad tomava decisões que criavam dependências invisíveis nos outros.</div>
+          <div class="ref-footer">
+            <span class="tag">Caso</span><span class="tag">Governança</span>
+            <button class="btn-use" style="margin-left:auto">Usar na edição</button>
+          </div>
+        </div>
+
+        <!-- item análise -->
+        <div class="ref-item">
+          <div class="ref-header">
+            <div class="ref-type"><svg width="12" height="12" color="var(--sub)"><use href="#ic-brain"/></svg></div>
+            <div class="ref-title">Minha análise: o paradoxo da transformação digital em empresas tradicionais</div>
+            <div class="ref-date">27 mai</div>
+          </div>
+          <div class="ref-note">Empresas tradicionais falham em transformação digital não pela falta de budget mas pela incapacidade de tolerar ambiguidade temporária. A transformação exige que dois sistemas rodem em paralelo por um período — e a maioria não aguenta a tensão.</div>
+          <div class="ref-footer">
+            <span class="tag">Análise</span><span class="tag">Transformação digital</span>
+            <button class="btn-use" style="margin-left:auto">Usar na edição</button>
+          </div>
+        </div>
+
+        <div class="ref-item">
+          <div class="ref-header">
+            <div class="ref-type"><svg width="12" height="12" color="var(--sub)"><use href="#ic-link"/></svg></div>
+            <div class="ref-title">Gartner: 70% dos projetos de dados falham por questões organizacionais, não técnicas</div>
+            <div class="ref-date">22 mai</div>
+          </div>
+          <div class="ref-note">Dado que uso frequentemente em propostas. Humaniza o problema — o cliente que acha que precisa de mais tecnologia na verdade precisa de clareza organizacional.</div>
+          <div class="ref-footer">
+            <span class="tag">Dado</span><span class="tag">Dados</span>
+            <button class="btn-use" style="margin-left:auto">Usar na edição</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- sidebar de conexões -->
+    <div class="curadoria-sidebar">
+      <div class="sidebar-title">Conexões desta semana</div>
+      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:1rem;line-height:1.5">
+        A IA encontrou itens do seu banco que conectam com o digest de 08 jun
+      </div>
+
+      <div class="conn-card">
+        <div class="conn-card-label">
+          <svg width="10" height="10" color="var(--muted)"><use href="#ic-signal"/></svg>
+          Conexão forte
+        </div>
+        <div class="conn-card-title">McKinsey: IA como infraestrutura → 18% margem superior</div>
+        <div class="conn-card-why">Conversa com o dado da <em>a16z desta semana</em> — duas fontes independentes, mesma conclusão com 3 semanas de diferença. Isso vira evidência forte para uma nota do editor.</div>
+        <button class="btn-use">Adicionar à edição</button>
+      </div>
+
+      <div class="conn-card">
+        <div class="conn-card-label">
+          <svg width="10" height="10" color="var(--muted)"><use href="#ic-signal"/></svg>
+          Conexão moderada
+        </div>
+        <div class="conn-card-title">Caso Assaí: ownership por domínio sem camada de governança</div>
+        <div class="conn-card-why">O caso prático que ancora o insight do <em>CB Insights sobre data stewards</em> — transforma dado de mercado em experiência vivida.</div>
+        <button class="btn-use">Adicionar à edição</button>
+      </div>
+
+      <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)">
+        <div class="sidebar-title">Banco por categoria</div>
+        <div class="bar-row" style="margin-bottom:6px"><div class="bar-lbl">Referências</div><div class="bar-wrap"><div class="bar-fill" style="width:57%"></div></div><div class="bar-num">8</div></div>
+        <div class="bar-row" style="margin-bottom:6px"><div class="bar-lbl">Análises</div><div class="bar-wrap"><div class="bar-fill" style="width:28%"></div></div><div class="bar-num">4</div></div>
+        <div class="bar-row" style="margin-bottom:6px"><div class="bar-lbl">Dados</div><div class="bar-wrap"><div class="bar-fill" style="width:14%"></div></div><div class="bar-num">2</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ PROGRESSO ══════════ -->
+<div class="view" id="view-progress">
+  <div class="progress-layout">
+    <div class="page-header">
+      <div class="page-title">Painel de Progresso</div>
+      <div class="page-sub">Como o digest está aprendendo as suas preferências ao longo do tempo</div>
+    </div>
+
+    <div class="progress-grid">
+
+      <!-- score ao longo do tempo -->
+      <div class="progress-card" style="grid-column: span 2">
+        <div class="progress-card-label">Score médio por edição</div>
+        <div class="chart-bars" id="score-chart"></div>
+        <div class="chart-delta">Evolução nas últimas 5 edições: <strong>+13 pontos</strong> · o digest está aprendendo o que você considera acionável</div>
+      </div>
+
+      <!-- fontes mais relevantes -->
+      <div class="progress-card">
+        <div class="progress-card-label">Fontes com maior relevância para você</div>
+        <div id="source-ranking"></div>
+      </div>
+
+      <!-- temas dominantes -->
+      <div class="progress-card">
+        <div class="progress-card-label">Seus temas recorrentes</div>
+        <div class="theme-cloud" id="theme-cloud"></div>
+      </div>
+
+    </div>
+
+    <!-- momentos de aprendizado -->
+    <div class="progress-card" style="margin-top:0">
+      <div class="progress-card-label">Momentos de aprendizado</div>
+      <div class="momentum-row">
+        <div class="momentum-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-signal"/></svg></div>
+        <div class="momentum-text">Fontes de <strong>sinal antecipado</strong> têm score médio 6 pontos acima das fontes de mercado no seu perfil</div>
+        <div class="momentum-val">+6 pts</div>
+      </div>
+      <div class="momentum-row">
+        <div class="momentum-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-data"/></svg></div>
+        <div class="momentum-text">Conteúdo sobre <strong>governança de dados</strong> tem 3× mais chance de ser salvo por você do que a média</div>
+        <div class="momentum-val">3×</div>
+      </div>
+      <div class="momentum-row">
+        <div class="momentum-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-brain"/></svg></div>
+        <div class="momentum-text"><strong>Every.to</strong> e <strong>a16z</strong> são as fontes com maior consistência de relevância nas últimas 4 semanas</div>
+        <div class="momentum-val">↑ top 2</div>
+      </div>
+      <div class="momentum-row">
+        <div class="momentum-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-people"/></svg></div>
+        <div class="momentum-text">Conteúdo sobre <strong>liderança de produto</strong> teve queda de relevância nas últimas 2 edições — pode ser hora de revisar essa fonte</div>
+        <div class="momentum-val">↓ revise</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ HISTÓRICO ══════════ -->
+<div class="view" id="view-history">
+  <div class="history-layout">
+    <div class="page-header">
+      <div class="page-title">Histórico de edições</div>
+      <div class="page-sub">Todas as edições geradas, com evolução de score ao longo do tempo</div>
+    </div>
+    <div class="history-stats">
+      <div class="stat"><div class="stat-num" style="font-size:1.2rem">8</div><div class="stat-lbl">Edições geradas</div></div>
+      <div class="stat"><div class="stat-num" style="font-size:1.2rem">23</div><div class="stat-lbl">Insights salvos</div></div>
+      <div class="stat"><div class="stat-num" style="font-size:1.2rem">↑ 87</div><div class="stat-lbl">Score médio atual</div></div>
+    </div>
+    <div class="score-trend">
+      <svg width="14" height="14" color="var(--sub)"><use href="#ic-signal"/></svg>
+      Seu score médio subiu de <strong>74 → 87</strong> nas últimas 4 semanas. O digest está aprendendo suas preferências.
+    </div>
+    <div class="history-timeline" id="history-timeline">
+      <!-- renderizado pelo JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ EQUIPE ══════════ -->
+<div class="view" id="view-team">
+  <div class="page-layout">
+    <div class="page-header">
+      <div class="page-title">Visão da Equipe — Semana 23</div>
+      <div class="page-sub">Itens sinalizados por 2 ou mais pessoas do time</div>
+    </div>
+    <div class="member-row">
+      <div class="member-chip"><div class="m-avatar" style="background:#6d28d9">BG</div><div class="m-name">Bruno Gentil</div></div>
+      <div class="member-chip"><div class="m-avatar" style="background:#1d4ed8">RC</div><div class="m-name">Rafaela Costa</div></div>
+      <div class="member-chip"><div class="m-avatar" style="background:#065f46">DM</div><div class="m-name">Diego Martins</div></div>
+      <div class="member-chip"><div class="m-avatar" style="background:#7c3aed">AM</div><div class="m-name">Ana Medeiros</div></div>
+      <button class="invite-btn" onclick="toggleInvite()">
+        <svg width="12" height="12" color="currentColor"><use href="#ic-plus"/></svg>
+        Convidar
+      </button>
+    </div>
+    <div class="invite-row" id="invite-row">
+      <input class="invite-input" id="invite-email" type="email" placeholder="email@empresa.com">
+      <button class="btn-invite" onclick="sendInvite()">Enviar convite</button>
+    </div>
+    <div class="section-label" style="margin-top:0">3 overlaps identificados</div>
+    <div class="overlap-card strong">
+      <div class="ov-header">
+        <div><div class="ov-avatars"><div class="ov-av" style="background:#6d28d9">BG</div><div class="ov-av" style="background:#1d4ed8">RC</div><div class="ov-av" style="background:#065f46">DM</div></div></div>
+        <div style="flex:1"><div class="ov-badge">3 pessoas sinalizaram</div><div class="ov-title">IA como nova camada de coordenação em organizações B2B</div><div class="ov-source">a16z · Score médio 89</div></div>
+      </div>
+      <div class="ov-summary">Empresas B2B que adotaram IA não como automação mas como infraestrutura de tomada de decisão estão vendo ganhos de velocidade 3× maiores.</div>
+      <div class="ov-theme">Tema: <em>Adoção de IA em B2B</em> · 2 edições esta semana</div>
+    </div>
+    <div class="overlap-card">
+      <div class="ov-header">
+        <div><div class="ov-avatars"><div class="ov-av" style="background:#6d28d9">BG</div><div class="ov-av" style="background:#7c3aed">AM</div></div></div>
+        <div style="flex:1"><div class="ov-badge">2 pessoas sinalizaram</div><div class="ov-title">Por que 67% dos projetos de transformação digital falham na fase de escala</div><div class="ov-source">CB Insights · Score médio 86</div></div>
+      </div>
+      <div class="ov-summary">O gargalo não está na tecnologia mas na governança de dados. Data stewards por domínio têm taxa de sucesso 2,4× maior.</div>
+      <div class="ov-theme">Tema: <em>Governança de dados</em></div>
+    </div>
+    <div class="overlap-card">
+      <div class="ov-header">
+        <div><div class="ov-avatars"><div class="ov-av" style="background:#1d4ed8">RC</div><div class="ov-av" style="background:#065f46">DM</div></div></div>
+        <div style="flex:1"><div class="ov-badge">2 pessoas sinalizaram</div><div class="ov-title">A regulação de IA como pressão competitiva</div><div class="ov-source">Noema Magazine · Score médio 88</div></div>
+      </div>
+      <div class="ov-summary">Compliance de IA pode virar critério de seleção de fornecedor B2B antes de 2027.</div>
+      <div class="ov-theme">Tema: <em>Regulação de IA</em> · Sinal antecipado 2–3 anos</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ GESTOR ══════════ -->
+<div class="view" id="view-manager">
+  <div class="page-layout">
+    <div class="page-header">
+      <div class="page-title">Painel Gestor — Semana 23</div>
+      <div class="page-sub">Inteligência coletiva da equipe — sem identificação individual</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat"><div class="stat-num">4</div><div class="stat-lbl">Pessoas ativas</div></div>
+      <div class="stat"><div class="stat-num">3</div><div class="stat-lbl">Overlaps</div></div>
+      <div class="stat"><div class="stat-num">11</div><div class="stat-lbl">Itens salvos</div></div>
+      <div class="stat"><div class="stat-num">86</div><div class="stat-lbl">Score médio</div></div>
+    </div>
+    <div class="signal-box">
+      <div class="signal-box-lbl">Sinal da semana</div>
+      <div class="signal-box-text">3 pessoas sinalizaram independentemente temas sobre <strong>adoção de IA em B2B</strong> sem combinação prévia. Pode ser o momento de estruturar um ponto de vista da equipe sobre o tema.</div>
+    </div>
+    <div class="section-label" style="margin-top:0">Temas com maior convergência</div>
+    <div class="theme-row">
+      <div class="theme-icon"><svg width="16" height="16" color="var(--sub)"><use href="#ic-robot"/></svg></div>
+      <div class="theme-content"><div class="theme-name">Adoção de IA em B2B</div><div class="theme-desc">Coordenação, rituais, fricção intencional</div></div>
+      <div class="theme-right"><div class="theme-count">4</div><div class="theme-persons">3 pessoas</div><div class="trend">↑ Alta</div></div>
+    </div>
+    <div class="theme-row">
+      <div class="theme-icon"><svg width="16" height="16" color="var(--sub)"><use href="#ic-data"/></svg></div>
+      <div class="theme-content"><div class="theme-name">Governança de dados</div><div class="theme-desc">Data stewards, escala, domínios</div></div>
+      <div class="theme-right"><div class="theme-count">2</div><div class="theme-persons">2 pessoas</div><div class="trend">↑ Crescendo</div></div>
+    </div>
+    <div class="theme-row">
+      <div class="theme-icon"><svg width="16" height="16" color="var(--sub)"><use href="#ic-law"/></svg></div>
+      <div class="theme-content"><div class="theme-name">Regulação de IA</div><div class="theme-desc">Europa, compliance, B2B</div></div>
+      <div class="theme-right"><div class="theme-count">2</div><div class="theme-persons">2 pessoas</div><div class="trend">◆ Novo</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ CURADOR ══════════ -->
+<div class="view" id="view-curator">
+  <div class="curator-layout">
+    <div class="curator-sidebar">
+      <div class="curator-profile">
+        <div class="curator-avatar">BG</div>
+        <div class="curator-name">Bruno Gentil</div>
+        <div class="curator-handle">@brunogentil</div>
+        <div class="curator-toggle">
+          <div class="toggle-pill"></div>
+          <div class="toggle-lbl">Modo curador ativo</div>
+        </div>
+        <div class="share-row" onclick="copyLink(this)">
+          <svg width="13" height="13" color="var(--muted)"><use href="#ic-link"/></svg>
+          <div class="share-url">lens.ai/c/brunogentil</div>
+          <div class="share-copy">
+            <svg width="12" height="12" color="var(--sub)"><use href="#ic-copy"/></svg>
+          </div>
+        </div>
+        <div class="curator-stats">
+          <div class="c-stat"><div class="c-stat-num">34</div><div class="c-stat-lbl">Assinantes</div></div>
+          <div class="c-stat"><div class="c-stat-num">8</div><div class="c-stat-lbl">Edições</div></div>
+          <div class="c-stat"><div class="c-stat-num">91%</div><div class="c-stat-lbl">Abertura</div></div>
+          <div class="c-stat"><div class="c-stat-num">4.8</div><div class="c-stat-lbl">Avaliação</div></div>
+        </div>
+      </div>
+      <div class="sidebar-title">Para publicar</div>
+      <div class="saved-item"><div class="saved-item-title">IA como camada de coordenação em orgs B2B</div><div class="saved-item-meta" style="color:var(--sub)">✓ Nota adicionada</div></div>
+      <div class="saved-item"><div class="saved-item-title">Por que times falham na adoção de IA</div><div class="saved-item-meta">Sem nota ainda</div></div>
+      <div class="saved-item"><div class="saved-item-title">Regulação de IA como pressão competitiva</div><div class="saved-item-meta" style="color:var(--sub)">✓ Nota adicionada</div></div>
+    </div>
+    <div class="curator-feed">
+      <div class="feed-header">
+        <div class="feed-title">Rascunho — Edição #9</div>
+        <div class="feed-meta">3 itens · 2 notas do editor</div>
+      </div>
+      <div class="section-label" style="margin-top:0.35rem">Itens selecionados</div>
+      <div class="curator-card">
+        <div class="card-source">a16z</div>
+        <div class="card-title">IA como nova camada de coordenação em organizações B2B</div>
+        <div class="card-summary">Empresas B2B que adotaram IA como infraestrutura de tomada de decisão estão vendo ganhos de velocidade 3× maiores.</div>
+        <div class="editor-note-area">
+          <div class="editor-note-label"><svg width="11" height="11" color="var(--muted)"><use href="#ic-note"/></svg> <span>Nota do editor</span></div>
+          <div class="editor-note-filled">O que mais me chamou atenção foi a inversão de lógica: a maioria das empresas ainda pensa em IA como substituta de tarefa, não como infraestrutura de decisão. Essa distinção muda o orçamento, o time responsável e o critério de sucesso — são três decisões diferentes, não uma.</div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-pub">Publicar com nota</button>
+          <button class="btn-ghost">Publicar sem nota</button>
+          <button class="btn-ghost" style="margin-left:auto">Remover</button>
+        </div>
+      </div>
+      <div class="curator-card">
+        <div class="card-source">Every.to</div>
+        <div class="card-title">O problema real com adoção de IA em times de produto</div>
+        <div class="card-summary">Não é ceticismo — é a ausência de rituais. Times que adotam IA com sucesso têm pelo menos um ritual semanal coletivo.</div>
+        <div class="editor-note-area">
+          <div class="editor-note-label"><svg width="11" height="11" color="var(--muted)"><use href="#ic-note"/></svg> <span>Nota do editor</span> <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— opcional</span></div>
+          <textarea class="editor-note-input" placeholder="O que esse conteúdo muda na sua forma de pensar?"></textarea>
+        </div>
+        <div class="card-actions">
+          <button class="btn-pub">Publicar com nota</button>
+          <button class="btn-ghost">Publicar sem nota</button>
+          <button class="btn-ghost" style="margin-left:auto">Remover</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ FONTES ══════════ -->
+<div class="view" id="view-fontes">
+  <div class="fontes-layout">
+    <div class="page-header">
+      <div class="page-title">Conectar fontes</div>
+      <div class="page-sub">Newsletters e sites que alimentam o seu digest</div>
+    </div>
+    <div class="active-sources">
+      <div class="active-title">Fontes ativas — 6 conectadas</div>
+      <div class="active-pills">
+        <div class="active-pill">Every.to <span class="rm">×</span></div>
+        <div class="active-pill">Product Hunt <span class="rm">×</span></div>
+        <div class="active-pill">The Rundown AI <span class="rm">×</span></div>
+        <div class="active-pill">CB Insights <span class="rm">×</span></div>
+        <div class="active-pill">a16z <span class="rm">×</span></div>
+        <div class="active-pill">Noema <span class="rm">×</span></div>
+      </div>
+    </div>
+    <div class="search-bar">
+      <svg width="15" height="15" color="var(--muted)"><use href="#ic-search"/></svg>
+      <input class="search-input" placeholder="Buscar newsletter ou site...">
+    </div>
+    <div class="fonte-category">
+      <div class="fonte-cat-label">Newsletters</div>
+      <div class="fonte-grid">
+        <div class="fonte-item active"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-brain"/></svg></div><div class="fonte-name">Every.to</div></div>
+        <div class="fonte-item active"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-ph"/></svg></div><div class="fonte-name">Product Hunt</div></div>
+        <div class="fonte-item active"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-ai"/></svg></div><div class="fonte-name">Rundown AI</div></div>
+        <div class="fonte-item active"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-chart"/></svg></div><div class="fonte-name">CB Insights</div></div>
+        <div class="fonte-item"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-mail"/></svg></div><div class="fonte-name">Dense Discovery</div></div>
+        <div class="fonte-item"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-rss"/></svg></div><div class="fonte-name">Futurism</div></div>
+        <div class="fonte-item"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-mail"/></svg></div><div class="fonte-name">Morning Brew</div></div>
+        <div class="fonte-item"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-brain"/></svg></div><div class="fonte-name">TLDR</div></div>
+      </div>
+    </div>
+    <div class="fonte-category">
+      <div class="fonte-cat-label">Sites & análises</div>
+      <div class="fonte-grid">
+        <div class="fonte-item active"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-globe"/></svg></div><div class="fonte-name">a16z</div></div>
+        <div class="fonte-item"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-rss"/></svg></div><div class="fonte-name">Platformer</div></div>
+        <div class="fonte-item"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-people"/></svg></div><div class="fonte-name">Mind the Product</div></div>
+        <div class="fonte-item"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-chart"/></svg></div><div class="fonte-name">CDOTrends</div></div>
+      </div>
+    </div>
+    <div class="fonte-category">
+      <div class="fonte-cat-label">Sinais antecipados</div>
+      <div class="fonte-grid">
+        <div class="fonte-item active"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-globe"/></svg></div><div class="fonte-name">Noema</div></div>
+        <div class="fonte-item"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-brain"/></svg></div><div class="fonte-name">Aeon Essays</div></div>
+        <div class="fonte-item"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-signal"/></svg></div><div class="fonte-name">Beh. Scientist</div></div>
+        <div class="fonte-item"><div class="fonte-icon"><svg width="14" height="14" color="var(--sub)"><use href="#ic-rss"/></svg></div><div class="fonte-name">Works in Progress</div></div>
+      </div>
+    </div>
+    <div class="fonte-category">
+      <div class="fonte-cat-label">RSS personalizado</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input style="flex:1;background:var(--s1);border:1px solid var(--border2);border-radius:7px;padding:0.55rem 0.8rem;color:var(--text);font-size:0.8rem;font-family:inherit" placeholder="https://...">
+        <button class="btn-pub" style="padding:0.55rem 1rem;white-space:nowrap">Adicionar</button>
+      </div>
+    </div>
+    <button class="btn-save-config">Salvar configuração</button>
+  </div>
+</div>
+
+<script>
+// ── LANDING → AUTH ──
+function landingToAuth(step) {
+  const landing = document.getElementById('landing-screen');
+  const auth    = document.getElementById('auth-screen');
+  landing.style.transition = 'opacity 0.35s ease';
+  landing.style.opacity = '0';
+  setTimeout(() => {
+    landing.style.display = 'none';
+    auth.style.display = '';
+    auth.style.opacity = '0';
+    auth.style.transition = 'opacity 0.3s ease';
+    requestAnimationFrame(() => { auth.style.opacity = '1'; });
+    if (step === 'login')   goToLogin();
+    else                    goToProfile();
+  }, 340);
+}
+
+// ── PARTICLE CANVAS ──
+(function () {
+  const canvas = document.getElementById('landing-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  const PURPLE = 'rgba(139,92,246,';
+  const DIM    = 'rgba(86,88,112,';
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function spawn() {
+    particles = [];
+    const count = Math.min(Math.floor(W * H / 7000), 180);
+    for (let i = 0; i < count; i++) {
+      const bright = Math.random() < 0.18;
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.6 + 0.4,
+        vx: (Math.random() - 0.5) * 0.22,
+        vy: (Math.random() - 0.5) * 0.18,
+        alpha: Math.random() * 0.5 + 0.15,
+        bright,
+        pulse: Math.random() * Math.PI * 2,
+        pulseSpeed: 0.008 + Math.random() * 0.012,
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const t = performance.now() / 1000;
+    for (const p of particles) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      p.pulse += p.pulseSpeed;
+      const a = p.alpha * (0.75 + 0.25 * Math.sin(p.pulse));
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.bright ? `${PURPLE}${a})` : `${DIM}${a})`;
+      ctx.fill();
+    }
+    // subtle lines between close bright particles
+    const brights = particles.filter(p => p.bright);
+    for (let i = 0; i < brights.length; i++) {
+      for (let j = i + 1; j < brights.length; j++) {
+        const dx = brights[i].x - brights[j].x;
+        const dy = brights[i].y - brights[j].y;
+        const d  = Math.sqrt(dx * dx + dy * dy);
+        if (d < 120) {
+          ctx.beginPath();
+          ctx.moveTo(brights[i].x, brights[i].y);
+          ctx.lineTo(brights[j].x, brights[j].y);
+          ctx.strokeStyle = `${PURPLE}${0.06 * (1 - d / 120)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    if (document.getElementById('landing-screen') &&
+        document.getElementById('landing-screen').style.display !== 'none') {
+      requestAnimationFrame(draw);
+    }
+  }
+
+  resize();
+  spawn();
+  draw();
+  window.addEventListener('resize', () => { resize(); spawn(); });
+})();
+
+let currentProfile = null;
+let savedCount = 0;
+let digestLoaded = false;
+let demoMode = false;
+
+const navConfig = {
+  pf_basic: [
+    { id: 'individual', label: 'Meu Digest' },
+    { id: 'history',    label: 'Histórico', locked: true },
+    { id: 'progress',   label: 'Progresso', locked: true },
+    { id: 'fontes',     label: '+ Fontes' },
+    { id: 'plans',      label: 'Ver planos', accent: true },
+  ],
+  pf_curator: [
+    { id: 'individual',  label: 'Meu Digest' },
+    { id: 'curadoria',   label: 'Minha Curadoria' },
+    { id: 'history',     label: 'Histórico' },
+    { id: 'progress',    label: 'Progresso' },
+    { id: 'curator',     label: 'Publicar' },
+    { id: 'public',      label: 'Prévia pública' },
+    { id: 'fontes',      label: '+ Fontes' },
+  ],
+  pj_admin: [
+    { id: 'individual', label: 'Meu Digest' },
+    { id: 'team',       label: 'Equipe' },
+    { id: 'manager',    label: 'Gestor',    locked: true },
+    { id: 'history',    label: 'Histórico', locked: true },
+    { id: 'progress',   label: 'Progresso', locked: true },
+    { id: 'fontes',     label: '+ Fontes' },
+    { id: 'plans',      label: 'Ver planos', accent: true },
+  ],
+  pj_member: [
+    { id: 'individual', label: 'Meu Digest' },
+    { id: 'team',       label: 'Equipe' },
+    { id: 'history',    label: 'Histórico' },
+    { id: 'fontes',     label: '+ Fontes' },
+  ],
+};
+
+// ── AUTH STEPS ──
+function hideAllSteps() {
+  ['step-landing','step-login','step-login-profile','step-profile','step-form','step-onboard'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+}
+function goToLanding()  { hideAllSteps(); document.getElementById('step-landing').style.display = ''; }
+function goToLogin()        { hideAllSteps(); document.getElementById('step-login').style.display = ''; }
+function goToLoginProfile() { hideAllSteps(); document.getElementById('step-login-profile').style.display = ''; }
+
+function goToLoginWithEmail() {
+  const emailEl = document.getElementById('login-email');
+  const passEl  = document.getElementById('login-password');
+  let ok = true;
+  if (!emailEl.value.trim()) { emailEl.style.borderColor = 'var(--plum)'; emailEl.focus(); ok = false; }
+  if (!passEl.value.trim())  { passEl.style.borderColor  = 'var(--plum)'; if (ok) passEl.focus(); ok = false; }
+  if (!ok) { setTimeout(() => { emailEl.style.borderColor = ''; passEl.style.borderColor = ''; }, 2000); return; }
+  goToLoginProfile();
+}
+function goToProfile()  { hideAllSteps(); document.getElementById('step-profile').style.display = ''; }
+const profileMeta = {
+  pf_basic:   { label: 'Pessoa física',      icon: 'ic-user',     isPJ: false },
+  pf_curator: { label: 'PF Curador',         icon: 'ic-note',     isPJ: false },
+  pj_admin:   { label: 'Empresa — Admin',    icon: 'ic-building', isPJ: true  },
+  pj_member:  { label: 'Empresa — Membro',   icon: 'ic-people',   isPJ: true  },
+};
+
+function goToForm() {
+  if (!currentProfile) return;
+  hideAllSteps();
+  document.getElementById('step-form').style.display = '';
+  const meta = profileMeta[currentProfile];
+  const badge = document.getElementById('form-badge');
+  badge.innerHTML = `<svg width="12" height="12" color="var(--sub)"><use href="#${meta.icon}"/></svg> ${meta.label}`;
+  const pjFields = document.getElementById('pj-fields');
+  pjFields.style.display = meta.isPJ ? '' : 'none';
+  if (!meta.isPJ) pjFields.querySelectorAll('input, select').forEach(el => el.value = '');
+}
+function goToOnboard() {
+  hideAllSteps();
+  document.getElementById('step-onboard').style.display = '';
+  obShowQ(1);
+}
+
+// ── ONBOARDING CONTEXTO ──
+let obSector = '', obDecision = '', obBlindSpot = '';
+
+function obShowQ(n) {
+  [1,2,3,4].forEach(i => {
+    const el = document.getElementById(i === 4 ? 'ob-result' : 'ob-q' + i);
+    if (el) el.style.display = i === n ? '' : 'none';
+  });
+  const dot2 = document.getElementById('ob-dot-2');
+  const dot3 = document.getElementById('ob-dot-3');
+  const lbl3 = document.getElementById('ob-lbl-3');
+  if (n <= 2) {
+    dot2.className = 'onboard-dot active'; dot2.textContent = '2';
+    dot3.className = 'onboard-dot pending'; dot3.textContent = '3';
+    lbl3.className = 'onboard-label';
+  } else if (n === 3) {
+    dot2.className = 'onboard-dot done'; dot2.textContent = '✓';
+    dot3.className = 'onboard-dot active'; dot3.textContent = '3';
+    lbl3.className = 'onboard-label active';
+  } else {
+    dot2.className = 'onboard-dot done'; dot2.textContent = '✓';
+    dot3.className = 'onboard-dot active'; dot3.textContent = '3';
+    lbl3.className = 'onboard-label active';
+  }
+}
+
+function obSelectSector(el, value) {
+  document.querySelectorAll('.ob-sector').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  obSector = value;
+  document.getElementById('ob-sector-other').value = '';
+  document.getElementById('ob-btn-1').disabled = false;
+}
+
+function obClearSector() {
+  document.querySelectorAll('.ob-sector').forEach(s => s.classList.remove('selected'));
+  obSector = document.getElementById('ob-sector-other').value.trim();
+  document.getElementById('ob-btn-1').disabled = !obSector;
+}
+
+function obNextQ(from) {
+  if (from === 1) {
+    if (!obSector) obSector = document.getElementById('ob-sector-other').value.trim();
+    obShowQ(2);
+  } else if (from === 2) {
+    obDecision = document.getElementById('ob-decision').value.trim();
+    obShowQ(3);
+  }
+}
+
+function obGoBack(from) {
+  obShowQ(from - 1);
+}
+
+function obCheckQ2() {
+  document.getElementById('ob-btn-2').disabled =
+    !document.getElementById('ob-decision').value.trim();
+}
+
+function obCheckQ3() {
+  document.getElementById('ob-btn-3').disabled =
+    !document.getElementById('ob-blind').value.trim();
+}
+
+function obFillDecision(chip) {
+  document.getElementById('ob-decision').value = chip.textContent;
+  obCheckQ2();
+}
+
+function obFillBlind(chip) {
+  document.getElementById('ob-blind').value = chip.textContent;
+  obCheckQ3();
+}
+
+const obThemeMap = {
+  'Tecnologia & Produto':   ['IA aplicada', 'Produto', 'Plataformas', 'Dev tools', 'SaaS'],
+  'Saúde & Biotech':        ['Biotech', 'Regulação FDA/Anvisa', 'Digital health', 'Investimento'],
+  'Varejo & Consumo':       ['Comportamento do consumidor', 'E-commerce', 'Omnichannel', 'Supply chain'],
+  'Financeiro & Fintechs':  ['Open finance', 'Regulação', 'Crédito', 'Pagamentos', 'DeFi'],
+  'Educação & RH':          ['Future of work', 'EdTech', 'Talento', 'IA em aprendizagem'],
+  'Consultoria & Advisory': ['Estratégia', 'Transformação digital', 'Liderança', 'B2B'],
+};
+
+const obSourceMap = {
+  'Tecnologia & Produto':   ['Every.to','a16z','Product Hunt','Rundown AI'],
+  'Saúde & Biotech':        ['STAT News','a16z Bio','CB Insights','Noema'],
+  'Varejo & Consumo':       ['CB Insights','Morning Brew','Retail Dive','Noema'],
+  'Financeiro & Fintechs':  ['CB Insights','a16z','Axios Fintech','Noema'],
+  'Educação & RH':          ['Every.to','Future Forum','SHRM','CB Insights'],
+  'Consultoria & Advisory': ['HBR','a16z','Every.to','CB Insights'],
+};
+
+function obBuildContext() {
+  obBlindSpot = document.getElementById('ob-blind').value.trim();
+
+  document.getElementById('res-sector').textContent   = obSector;
+  document.getElementById('res-decision').textContent = obDecision;
+  document.getElementById('res-blind').textContent    = obBlindSpot;
+
+  const themes = obThemeMap[obSector] || ['Mercado', 'Estratégia', 'Tendências', 'Inovação'];
+  document.getElementById('res-themes').innerHTML =
+    themes.map(t => `<span class="ob-theme-tag">${t}</span>`).join('');
+
+  const sources = obSourceMap[obSector] || ['Every.to','a16z','CB Insights','Noema'];
+  const icons = { 'Every.to':'ic-brain','a16z':'ic-globe','Product Hunt':'ic-ph',
+    'Rundown AI':'ic-ai','CB Insights':'ic-chart','Noema':'ic-globe',
+    'STAT News':'ic-signal','HBR':'ic-note','Morning Brew':'ic-mail',
+    'Axios Fintech':'ic-chart','Future Forum':'ic-people','SHRM':'ic-people',
+    'Retail Dive':'ic-globe','a16z Bio':'ic-brain','STAT News':'ic-signal' };
+  document.getElementById('res-sources').innerHTML = sources.map(s => `
+    <div class="fonte-mini active">
+      <div class="fonte-mini-icon">
+        <svg width="14" height="14" color="var(--sub)"><use href="#${icons[s]||'ic-globe'}"/></svg>
+      </div>
+      <div class="fonte-mini-name">${s}</div>
+    </div>`).join('');
+
+  obShowQ(4);
+}
+
+function selectProfile(type) {
+  currentProfile = type;
+  ['pf_basic','pf_curator','pj_admin','pj_member'].forEach(p => {
+    const el = document.getElementById('card-' + p);
+    if (el) el.classList.toggle('selected', p === type);
+  });
+  document.getElementById('btn-next').disabled = false;
+}
+
+// ── ENTER APP ──
+function enterAppDemo(profile) {
+  demoMode = true;
+  enterApp(profile);
+}
+
+function enterApp(profile) {
+  if (profile) currentProfile = profile;
+  document.getElementById('auth-screen').style.display = 'none';
+  const nav = document.getElementById('main-nav');
+  nav.style.display = 'flex';
+  buildNav();
+  renderFeed();
+  renderHistory();
+  renderProgress();
+  show('individual');
+}
+
+const pillLabels = {
+  pf_basic:   'Pessoal',
+  pf_curator: 'Curador',
+  pj_admin:   'Admin',
+  pj_member:  'Membro',
+};
+
+function buildNav() {
+  const container = document.getElementById('nav-tabs');
+  container.innerHTML = '';
+  navConfig[currentProfile].forEach((item, i) => {
+    const locked = demoMode ? false : item.locked;
+    const tab = document.createElement('div');
+    tab.className = 'nav-tab' + (i === 0 ? ' active' : '');
+    tab.innerHTML = locked
+      ? `${item.label} <svg width="10" height="10" color="var(--muted)" style="margin-left:3px"><use href="#ic-lock"/></svg>`
+      : item.label;
+    tab.style.opacity = locked ? '0.55' : '1';
+    tab.style.color   = (!locked && item.accent) ? 'var(--purple)' : '';
+    tab.onclick = () => locked ? showLocked(item.label) : show(item.id);
+    container.appendChild(tab);
+  });
+  document.getElementById('nav-pill').textContent = pillLabels[currentProfile] || '';
+  // chip de demo visível na nav
+  const demoPill = document.getElementById('demo-pill');
+  if (demoPill) demoPill.style.display = demoMode ? '' : 'none';
+}
+
+function show(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if (view) view.classList.add('active');
+  const items = navConfig[currentProfile];
+  const idx = items.findIndex(i => i.id === name);
+  const tabs = document.querySelectorAll('.nav-tab');
+  if (idx >= 0) tabs[idx].classList.add('active');
+  if (name === 'plans') {
+    const seg = (currentProfile === 'pj_admin' || currentProfile === 'pj_member') ? 'pj' : 'pf';
+    document.getElementById('plans-pf').style.display = seg === 'pf' ? '' : 'none';
+    document.getElementById('plans-pj').style.display = seg === 'pj' ? '' : 'none';
+    const segTabs = document.querySelectorAll('.segment-tab');
+    segTabs.forEach(t => t.classList.remove('active'));
+    segTabs[seg === 'pf' ? 0 : 1].classList.add('active');
+  }
+}
+
+function showLocked(label) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const locked = document.getElementById('view-locked');
+  locked.querySelector('.lock-title').textContent = label + ' — recurso Premium';
+  const msgs = {
+    pf_basic: 'Disponível no plano Pro (R$29/mês) — inclui histórico completo, painel de progresso e mais fontes.',
+    pj_admin: 'Disponível no plano Pro PJ (R$49/membro/mês) — desbloqueia Gestor, Histórico e Progresso da equipe.',
+  };
+  locked.querySelector('.lock-sub').textContent =
+    msgs[currentProfile] || 'Disponível nos planos pagos. Faça upgrade para desbloquear.';
+  locked.classList.add('active');
+}
+
+// ── FEED: empty state ou cards ──
+function renderFeed() {
+  const feed = document.getElementById('feed-content');
+  if (!digestLoaded) {
+    feed.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg width="22" height="22" color="var(--muted)"><use href="#ic-signal"/></svg>
+        </div>
+        <div class="empty-title">Nenhum digest gerado ainda</div>
+        <div class="empty-sub">Configure suas fontes e gere seu primeiro digest para começar</div>
+        <button class="btn-cta" onclick="loadSampleDigest()">Gerar primeiro digest</button>
+      </div>`;
+  }
+}
+
+function loadSampleDigest() {
+  digestLoaded = true;
+  const feed = document.getElementById('feed-content');
+  feed.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:340px;gap:0.75rem;text-align:center;padding:2rem">
+      <div style="width:40px;height:40px;background:var(--s2);border-radius:12px;display:flex;align-items:center;justify-content:center">
+        <svg width="20" height="20" color="var(--muted)"><use href="#ic-brain"/></svg>
+      </div>
+      <div style="font-size:0.88rem;font-weight:500" id="loading-msg">Gerando seu digest…</div>
+      <div style="font-size:0.77rem;color:var(--muted)">Buscando sinais relevantes para o seu contexto</div>
+    </div>`;
+  const msgs = ['Analisando fontes…', 'Identificando conexões latentes…', 'Calculando relevância…'];
+  let mi = 0;
+  const cycle = setInterval(() => {
+    const el = document.getElementById('loading-msg');
+    if (el) el.textContent = msgs[mi++ % msgs.length];
+  }, 750);
+  setTimeout(() => { clearInterval(cycle); _renderSampleCards(feed); }, 2200);
+}
+
+function _renderSampleCards(feed) {
+  const cards = [
+    {
+      id: 'card-a16z-ia',
+      source: 'a16z',
+      title: 'IA como nova camada de coordenação em organizações B2B',
+      summary: 'Empresas B2B que adotaram IA não como automação mas como infraestrutura de tomada de decisão estão vendo ganhos de velocidade 3× maiores. O padrão emergente: IA coordenando fluxos entre equipes.',
+      latent: 'Aplicável ao modelo de squads — a questão não é quantas ferramentas o squad usa, mas se existe camada de coordenação entre os domínios de governança.',
+      tags: ['IA aplicada', 'B2B'],
+      claude: 91,
+      signal: false,
+    },
+    {
+      id: 'card-cbi-scale',
+      source: 'CB Insights',
+      title: 'Por que 67% dos projetos de transformação digital falham na fase de escala',
+      summary: 'O gargalo não está na tecnologia mas na governança de dados. Data stewards por domínio de negócio têm taxa de sucesso 2,4× maior em projetos de escala.',
+      latent: 'O modelo de data stewards mapeia diretamente para a estrutura de domínios de governança — sem responsável claro, a escala trava.',
+      tags: ['Transformação digital', 'Governança'],
+      claude: 88,
+      signal: false,
+    },
+    {
+      id: 'card-every-ritual',
+      source: 'Every.to',
+      title: 'O problema real com adoção de IA em times de produto',
+      summary: 'Não é ceticismo — é a ausência de rituais. Times que adotam IA com sucesso têm pelo menos um ritual semanal onde IA entra no fluxo coletivo.',
+      latent: 'O digest compartilhado semanal é exatamente esse mecanismo de fricção compartilhada que gera adoção real.',
+      tags: ['Produto', 'Adoção de IA'],
+      claude: 85,
+      signal: false,
+    },
+    {
+      id: 'card-noema-reg',
+      source: 'Noema Magazine',
+      title: 'A regulação de IA como pressão competitiva: quem define os padrões controla o mercado',
+      summary: 'A Europa usa regulação de IA como política industrial. Compliance de IA pode virar critério de seleção de fornecedor B2B antes de 2027.',
+      latent: 'Quem posicionar compliance de IA como diferencial competitivo agora está dois anos à frente no mercado B2B.',
+      tags: ['Regulação', 'B2B'],
+      claude: 89,
+      horizon: '2–3 anos',
+      signal: true,
+    },
+  ];
+
+  const sections = [
+    { label: 'Insights de mercado', color: '', items: cards.filter(c => !c.signal) },
+    { label: 'Sinais antecipados',  color: '', items: cards.filter(c => c.signal) },
+  ];
+
+  let html = `
+    <div class="feed-header">
+      <div class="feed-title">08 jun 2026</div>
+      <div class="feed-meta">Gap 3 dias · 6 insights · 4 sinais</div>
+    </div>`;
+
+  sections.forEach(sec => {
+    html += `<div class="section-label" ${sec.color ? `style="color:${sec.color}"` : ''}>${sec.label}</div>`;
+    sec.items.forEach(c => {
+      const tags = c.tags.map(t => `<span class="tag">${t}</span>`).join('');
+      const horizon = c.horizon ? `<span class="horizon">${c.horizon}</span>` : '';
+      const sourceColor = '';
+      html += `
+        <div class="card${c.signal ? ' signal' : ''}">
+          <div class="card-source" ${sourceColor}>${c.source}</div>
+          <div class="card-title">${c.title}</div>
+          <div class="card-summary">${c.summary}</div>
+          <div class="latent">
+            <div class="latent-label">Conexão latente</div>
+            <div class="latent-text">${c.latent}</div>
+          </div>
+          <div class="card-footer">
+            ${tags}${horizon}
+            <div class="score-group">
+              ${scorePicker(c.id, c.claude)}
+              <button class="btn-save" onclick="toggleSave(this,'${c.title}','${c.source} · ${c.claude}')">Salvar</button>
+            </div>
+          </div>
+        </div>`;
+    });
+  });
+
+  feed.innerHTML = html;
+}
+
+// ── SCORE LOGIC ──
+const SCORES_KEY = 'lens_scores_v1';
+
+function getScores() {
+  try { return JSON.parse(localStorage.getItem(SCORES_KEY)) || {}; } catch { return {}; }
+}
+
+function scorePicker(cardId, claudeScore) {
+  const scores = getScores();
+  const current = scores[cardId] || 0;
+  const pips = [1,2,3,4,5].map(n => {
+    const cls = current === n ? 'score-pip active' : current > 0 ? 'score-pip dim' : 'score-pip';
+    return `<div class="${cls}" onclick="setScore('${cardId}',${n},this.closest('.score-picker'))">${n}</div>`;
+  }).join('');
+  const youVal = current > 0
+    ? `<span class="score-val hi">${current}</span>`
+    : `<div class="score-picker">${pips}</div>`;
+  return `
+    <div class="score"><span class="score-lbl">Claude</span><span class="score-val hi">${claudeScore}</span></div>
+    <div class="score" id="you-${cardId}"><span class="score-lbl-inline">Você</span>${youVal}</div>`;
+}
+
+function setScore(cardId, value, pickerEl) {
+  const scores = getScores();
+  scores[cardId] = value;
+  try { localStorage.setItem(SCORES_KEY, JSON.stringify(scores)); } catch(e) {}
+
+  // atualiza o picker para mostrar o valor fixado
+  const youEl = document.getElementById('you-' + cardId);
+  youEl.innerHTML = `<span class="score-lbl-inline">Você</span><span class="score-val hi">${value}</span>`;
+
+  showToast();
+}
+
+function showToast(msg) {
+  const t   = document.getElementById('toast');
+  const lbl = document.getElementById('toast-msg');
+  if (showToast._t) clearTimeout(showToast._t);
+  if (msg && lbl) lbl.textContent = msg;
+  t.classList.add('show');
+  showToast._t = setTimeout(() => {
+    t.classList.remove('show');
+    if (msg && lbl) setTimeout(() => { lbl.textContent = 'Aprendizado registrado'; }, 300);
+  }, msg ? 3000 : 2200);
+}
+
+// ── SAVE LOGIC ──
+function toggleSave(btn, title, meta) {
+  const wasSaved = btn.classList.contains('saved');
+  btn.classList.toggle('saved');
+  btn.textContent = wasSaved ? 'Salvar' : '✓ Salvo';
+  if (!wasSaved) {
+    savedCount++;
+    addSidebarItem(title, meta);
+  } else {
+    savedCount = Math.max(0, savedCount - 1);
+  }
+  updateSavedCount();
+}
+
+function addSidebarItem(title, meta) {
+  const sidebar = document.getElementById('sidebar-saved');
+  const empty = sidebar.querySelector('.empty-state');
+  if (empty) empty.remove();
+  const item = document.createElement('div');
+  item.className = 'saved-item';
+  item.innerHTML = `<div class="saved-item-title">${title}</div><div class="saved-item-meta">${meta}</div>`;
+  sidebar.appendChild(item);
+}
+
+function updateSavedCount() {
+  const widget = document.getElementById('saved-count-widget');
+  document.getElementById('saved-count-num').textContent = savedCount;
+  widget.style.display = savedCount > 0 ? '' : 'none';
+}
+
+// ── PROGRESS ──
+const PROGRESS_DATA = {
+  scoreByEdition: [
+    { label: '25/mai', score: 74 },
+    { label: '29/mai', score: 79 },
+    { label: '03/jun', score: 83 },
+    { label: '05/jun', score: 85 },
+    { label: '08/jun', score: 87, current: true },
+  ],
+  sources: [
+    { name: 'a16z',             score: 91 },
+    { name: 'Noema',            score: 89 },
+    { name: 'CB Insights',      score: 88 },
+    { name: 'Beh. Scientist',   score: 87 },
+    { name: 'Every.to',         score: 85 },
+  ],
+  themes: [
+    { label: 'IA aplicada',          size: 'lg' },
+    { label: 'Governança',           size: 'lg' },
+    { label: 'B2B',                  size: 'md' },
+    { label: 'Regulação',            size: 'md' },
+    { label: 'Produto',              size: 'sm' },
+    { label: 'Transformação digital',size: 'sm' },
+    { label: 'Plataforma',           size: 'sm' },
+    { label: 'Dados',                size: 'sm' },
+  ],
+};
+
+function renderProgress() {
+  // chart de score
+  const chart = document.getElementById('score-chart');
+  if (!chart) return;
+  const max = Math.max(...PROGRESS_DATA.scoreByEdition.map(e => e.score));
+  chart.innerHTML = PROGRESS_DATA.scoreByEdition.map(e => {
+    const pct = Math.round((e.score / max) * 100);
+    return `
+      <div class="chart-bar-col">
+        <div class="chart-bar-val">${e.score}</div>
+        <div class="chart-bar ${e.current ? 'current' : ''}" style="height:${pct}%"></div>
+        <div class="chart-bar-lbl">${e.label}</div>
+      </div>`;
+  }).join('');
+
+  // ranking de fontes
+  const ranking = document.getElementById('source-ranking');
+  if (ranking) {
+    ranking.innerHTML = PROGRESS_DATA.sources.map((s, i) => `
+      <div class="source-row">
+        <div class="source-rank">${i + 1}</div>
+        <div class="source-name">${s.name}</div>
+        <div class="source-bar-wrap"><div class="source-bar-fill" style="width:${Math.round((s.score/100)*100)}%"></div></div>
+        <div class="source-score">${s.score}</div>
+      </div>`).join('');
+  }
+
+  // tema cloud
+  const cloud = document.getElementById('theme-cloud');
+  if (cloud) {
+    cloud.innerHTML = PROGRESS_DATA.themes.map(t =>
+      `<span class="theme-bubble ${t.size === 'lg' ? 'lg' : t.size === 'md' ? 'md' : ''}">${t.label}</span>`
+    ).join('');
+  }
+}
+
+// ── HISTORY ──
+const HISTORY_SEED = [
+  {
+    date: '08 jun 2026', gap: '3 dias', isCurrent: true,
+    themes: ['IA aplicada', 'Governança', 'Regulação'],
+    scoreMedia: 87, savedCount: 2,
+    items: [
+      { title: 'IA como camada de coordenação em orgs B2B', source: 'a16z', score: 91 },
+      { title: 'Por que projetos de transformação digital falham', source: 'CB Insights', score: 88 },
+      { title: 'O problema real com adoção de IA em times', source: 'Every.to', score: 85 },
+      { title: 'Regulação de IA como pressão competitiva', source: 'Noema', score: 89 },
+    ]
+  },
+  {
+    date: '05 jun 2026', gap: '2 dias', isCurrent: false,
+    themes: ['Produto', 'Liderança', 'IA aplicada'],
+    scoreMedia: 85, savedCount: 3,
+    items: [
+      { title: 'Como PMs estão usando IA para acelerar discovery', source: 'Mind the Product', score: 88 },
+      { title: 'O fim do roadmap anual: estratégia contínua em times ágeis', source: 'Every.to', score: 84 },
+      { title: 'Big tech reduz headcount mas aumenta receita — o que isso sinaliza', source: 'Platformer', score: 82 },
+    ]
+  },
+  {
+    date: '03 jun 2026', gap: '1 dia', isCurrent: false,
+    themes: ['Mercado B2B', 'Dados', 'Plataforma'],
+    scoreMedia: 83, savedCount: 1,
+    items: [
+      { title: 'Por que plataformas B2B estão investindo em inteligência de dados própria', source: 'a16z', score: 86 },
+      { title: 'O novo perfil do CDO: menos técnico, mais estratégico', source: 'CDOTrends', score: 81 },
+      { title: 'Rundown: os 5 modelos de IA mais usados em enterprise esta semana', source: 'Rundown AI', score: 79 },
+    ]
+  },
+  {
+    date: '29 mai 2026', gap: '4 dias', isCurrent: false,
+    themes: ['Transformação digital', 'Cultura', 'IA'],
+    scoreMedia: 79, savedCount: 2,
+    items: [
+      { title: 'Transformação digital começa pela cultura, não pela tecnologia', source: 'CB Insights', score: 83 },
+      { title: 'Times com psicologia segura adotam IA 2× mais rápido', source: 'Behavioral Scientist', score: 80 },
+      { title: 'Ferramenta de semana: Notion AI para síntese de reuniões', source: 'Product Hunt', score: 72 },
+    ]
+  },
+  {
+    date: '25 mai 2026', gap: '2 dias', isCurrent: false,
+    themes: ['Estratégia', 'B2B', 'Produto'],
+    scoreMedia: 74, savedCount: 1,
+    items: [
+      { title: 'Como empresas B2B estão precificando IA como feature vs. produto', source: 'Every.to', score: 77 },
+      { title: 'O ressurgimento do produto-led growth em mercados maduros', source: 'Mind the Product', score: 75 },
+      { title: 'Dense Discovery #312 — links selecionados sobre design e inovação', source: 'Dense Discovery', score: 68 },
+    ]
+  },
+];
+
+function renderHistory() {
+  const timeline = document.getElementById('history-timeline');
+  if (!timeline) return;
+  timeline.innerHTML = HISTORY_SEED.map((ed, i) => `
+    <div class="history-entry">
+      <div class="history-dot ${ed.isCurrent ? 'current' : ''}"></div>
+      <div class="history-card ${ed.isCurrent ? 'open' : ''}" onclick="toggleHistory(this)">
+        <div class="history-card-header">
+          <div class="history-date">${ed.date}</div>
+          ${ed.isCurrent ? '<span class="form-badge" style="margin:0;font-size:0.63rem">atual</span>' : ''}
+          <div class="history-gap">Gap ${ed.gap}</div>
+          <div class="history-badge">
+            <svg width="11" height="11" color="var(--muted)"><use href="#ic-note"/></svg>
+            ${ed.savedCount} salvos
+          </div>
+        </div>
+        <div class="history-themes">
+          ${ed.themes.map(t => `<span class="history-theme">${t}</span>`).join('')}
+        </div>
+        <div class="history-footer">
+          <div class="history-scores">
+            <div class="history-score-item">Score médio <span class="history-score-val ${ed.scoreMedia >= 85 ? 'up' : ''}">${ed.scoreMedia}</span></div>
+            <div class="history-score-item">${ed.items.length} cards</div>
+          </div>
+          <div class="history-expand">${ed.isCurrent ? '▲ aberto' : '▼ ver edição'}</div>
+        </div>
+        <div class="history-preview ${ed.isCurrent ? 'open' : ''}">
+          ${ed.items.map(it => `
+            <div class="history-preview-item">
+              <div class="history-preview-dot"></div>
+              <div class="history-preview-title">${it.title} <span style="color:var(--muted);font-size:0.65rem">· ${it.source}</span></div>
+              <div class="history-preview-score">${it.score}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleHistory(card) {
+  const preview = card.querySelector('.history-preview');
+  const expand  = card.querySelector('.history-expand');
+  const isOpen  = preview.classList.contains('open');
+  preview.classList.toggle('open', !isOpen);
+  card.classList.toggle('open', !isOpen);
+  expand.textContent = isOpen ? '▼ ver edição' : '▲ fechar';
+}
+
+// ── PLANS ──
+let billingYearly = false;
+const prices = {
+  pf:  { pro: { m: 29, y: 23 }, curator: { m: 59, y: 47 } },
+  pj:  { pro: { m: 49, y: 39 } },
+};
+
+function toggleBilling() {
+  billingYearly = !billingYearly;
+  document.getElementById('billing-toggle').classList.toggle('yearly', billingYearly);
+  document.getElementById('toggle-monthly').classList.toggle('active', !billingYearly);
+  document.getElementById('toggle-yearly').classList.toggle('active', billingYearly);
+  const b = billingYearly ? 'y' : 'm';
+  const sfx = billingYearly ? '/mês (anual)' : '/mês';
+  const el = id => document.getElementById(id);
+  if (el('pf-pro-price'))     el('pf-pro-price').innerHTML     = `R$ ${prices.pf.pro[b]}<span>/${sfx}</span>`;
+  if (el('pf-curator-price')) el('pf-curator-price').innerHTML = `R$ ${prices.pf.curator[b]}<span>/${sfx}</span>`;
+  if (el('pj-pro-price'))     el('pj-pro-price').innerHTML     = `R$ ${prices.pj.pro[b]}<span>/membro/${sfx}</span>`;
+}
+
+function switchSegment(tab, seg) {
+  document.querySelectorAll('.segment-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('plans-pf').style.display = seg === 'pf' ? '' : 'none';
+  document.getElementById('plans-pj').style.display = seg === 'pj' ? '' : 'none';
+}
+
+function toggleFaq(item) { item.classList.toggle('open'); }
+
+// ── PUBLIC PAGE ──
+function subscribeDemo(btn) {
+  if (btn && btn.tagName === 'BUTTON') {
+    const input = btn.closest('.subscribe-row')?.querySelector('.subscribe-input')
+                || document.getElementById('subscribe-email');
+    if (!input || !input.value.trim().includes('@')) {
+      if (input) { input.style.borderColor = 'var(--plum)'; input.focus(); setTimeout(() => input.style.borderColor = '', 2000); }
+      return;
+    }
+    btn.textContent = '✓ Inscrito!';
+    btn.style.background = 'var(--s2)';
+    btn.style.color = 'var(--sub)';
+    btn.disabled = true;
+    input.disabled = true;
+  }
+}
+
+// ── PLAN / PAGE / INVITE CTAs ──
+function showPlanCTA(plan) {
+  const msg = plan === 'Enterprise'
+    ? 'Enterprise — fale com a gente: contato@lens.ai'
+    : `Plano ${plan} — em breve! Deixa seu e-mail em contato@lens.ai`;
+  showToast(msg);
+}
+
+function createPublicPage() {
+  showToast('Sua página já está ativa em lens.ai/c/brunogentil');
+}
+
+function sendInvite() {
+  const input = document.getElementById('invite-email');
+  if (!input || !input.value.trim().includes('@')) {
+    if (input) { input.style.borderColor = 'var(--plum)'; input.focus(); setTimeout(() => input.style.borderColor = '', 2000); }
+    return;
+  }
+  const email = input.value.trim();
+  input.value = '';
+  document.getElementById('invite-row').classList.remove('visible');
+  showToast('Convite enviado para ' + email);
+}
+
+// ── CURADORIA ──
+function captureRef() {
+  const input = document.getElementById('capture-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const tags = [...document.querySelectorAll('.capture-tag-opt.sel')].map(t => t.textContent);
+  const bank = document.getElementById('ref-bank');
+  const item = document.createElement('div');
+  item.className = 'ref-item';
+  item.innerHTML = `
+    <div class="ref-header">
+      <div class="ref-type"><svg width="12" height="12" color="var(--sub)"><use href="#ic-note"/></svg></div>
+      <div class="ref-title">${text.slice(0,100)}${text.length > 100 ? '…' : ''}</div>
+      <div class="ref-date">agora</div>
+    </div>
+    <div class="ref-footer">
+      ${tags.map(t => `<span class="tag">${t}</span>`).join('')}
+      <button class="btn-use" style="margin-left:auto">Usar na edição</button>
+    </div>`;
+  bank.insertBefore(item, bank.firstChild);
+  input.value = '';
+  document.querySelectorAll('.capture-tag-opt').forEach(t => t.classList.remove('sel'));
+  showToast();
+}
+
+function filterBank(chip, filter) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  document.querySelectorAll('.ref-item').forEach(item => {
+    if (filter === 'all') { item.style.display = ''; return; }
+    if (filter === 'connected') { item.style.display = item.classList.contains('connected') ? '' : 'none'; return; }
+    const tags = [...item.querySelectorAll('.tag')].map(t => t.textContent.toLowerCase());
+    const map = { ref: 'referência', analysis: 'análise', data: 'dado' };
+    item.style.display = tags.some(t => t.includes(map[filter])) ? '' : 'none';
+  });
+}
+
+// ── MISC ──
+function toggleInvite() {
+  const row = document.getElementById('invite-row');
+  row.classList.toggle('visible');
+}
+
+function copyLink(el) {
+  const copy = el.querySelector('.share-copy');
+  copy.textContent = 'Copiado!';
+  setTimeout(() => {
+    copy.innerHTML = '<svg width="12" height="12" color="var(--sub)"><use href="#ic-copy"/></svg>';
+  }, 1500);
+}
+
+document.addEventListener('click', e => {
+  const target = e.target.closest('.fonte-item, .fonte-mini');
+  if (target) target.classList.toggle('active');
+});
+</script>
+</body>
+</html>
