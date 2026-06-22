@@ -186,7 +186,7 @@ export default function SourcesPanel({ sources }: { sources: Source[] }) {
   }
 
   return (
-    <div style={{ marginTop: '2.5rem' }}>
+    <div style={{ marginBottom: '2rem' }}>
       {/* Trigger */}
       <button
         onClick={() => setOpen(o => !o)}

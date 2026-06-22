@@ -48,11 +48,13 @@ export default function DigestView({ user, digest, allDigests, lastSeenAt, sourc
         {tab === 'digest' && (
           !digest ? <EmptyDigest /> : (
             <>
-              <div style={{ marginBottom: '2.5rem' }}>
+              <div style={{ marginBottom: '1.25rem' }}>
                 <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
                   Edição #{digest.edition} · {new Date(digest.published_at + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                 </span>
               </div>
+
+              <SourcesPanel sources={sources} />
 
               {hero && (
                 <HeroCard card={hero} userId={user.id} onScoreUpdate={handleScoreUpdate} onSaveToggle={handleSaveToggle} />
@@ -73,8 +75,6 @@ export default function DigestView({ user, digest, allDigests, lastSeenAt, sourc
                   </div>
                 </>
               )}
-
-              <SourcesPanel sources={sources} />
             </>
           )
         )}
