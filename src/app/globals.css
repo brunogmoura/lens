@@ -1,18 +1,48 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap');
 
 :root {
-  --bg:       #0c0c10;
-  --s1:       #13131a;
-  --s2:       #1a1a24;
-  --border:   #22222e;
-  --border2:  #2c2c3a;
-  --text:     #e4e6f0;
-  --sub:      #9a9db5;
-  --muted:    #565870;
-  --purple:   #6d28d9;
-  --plum:     #8b5cf6;
-  --plum-dim: rgba(139,92,246,0.10);
-  --plum-br:  rgba(139,92,246,0.22);
+  --bg:       #f4f3f0;
+  --s1:       #faf9f5;
+  --s2:       #ffffff;
+  --border:   #1a1915;
+  --border2:  #d9d7d1;
+  --border3:  #e3e1db;
+  --text:     #1a1915;
+  --sub:      #6a665d;
+  --muted:    #a39e95;
+  --purple:   #1a1915;
+  --plum:     #e3f794;
+  --plum-dim: rgba(227,247,148,0.18);
+  --plum-br:  rgba(227,247,148,0.5);
+  --lima:     #e3f794;
+}
+
+@keyframes scanField {
+  0%,18% { opacity:1; } 30%,90% { opacity:0; } 100% { opacity:1; }
+}
+@keyframes scanLine {
+  0% { top:-10%; opacity:0; } 4% { opacity:1; } 8% { top:0%; }
+  27% { top:100%; opacity:1; } 31%,100% { top:110%; opacity:0; }
+}
+@keyframes scanHeadline {
+  0%,18% { filter:blur(9px); opacity:0.16; }
+  31%,90% { filter:blur(0); opacity:1; }
+  100% { filter:blur(9px); opacity:0.16; }
+}
+@keyframes scanMark {
+  0%,33% { background-size:0% 0.42em; }
+  44%,90% { background-size:100% 0.42em; }
+  100% { background-size:0% 0.42em; }
+}
+@keyframes fragFloat {
+  0% { transform:translateY(8px); } 100% { transform:translateY(-8px); }
+}
+@keyframes lensFade {
+  from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); }
+}
+@keyframes lensRise {
+  from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,8 +50,8 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
-  font-size: 14px;
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 16px;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }

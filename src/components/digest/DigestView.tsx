@@ -16,13 +16,15 @@ type Props = {
   allDigests: HistoryDigest[]
   lastSeenAt: string | null
   sources: Source[]
+  userTopic: string | null
 }
 
 type Tab = 'digest' | 'saved' | 'history'
 
-export default function DigestView({ user, digest, allDigests, lastSeenAt, sources }: Props) {
+export default function DigestView({ user, digest, allDigests, lastSeenAt, sources, userTopic }: Props) {
   const [cards, setCards] = useState<DigestCard[]>(digest?.cards ?? [])
   const [tab, setTab] = useState<Tab>('digest')
+  const [showOtherTopics, setShowOtherTopics] = useState(false)
 
   function handleScoreUpdate(cardId: string, score: number) {
     setCards(prev => prev.map(c => c.id === cardId ? { ...c, user_score: score } : c))
@@ -33,10 +35,22 @@ export default function DigestView({ user, digest, allDigests, lastSeenAt, sourc
   }
 
   const sorted = [...cards].sort((a, b) => (b.claude_score ?? 0) - (a.claude_score ?? 0))
-  const hero = sorted[0] ?? null
-  const secondary = cards
+
+  // Hero: highest score among cards matching userTopic (or overall if no topic set)
+  const topicCards = userTopic ? sorted.filter(c => c.tags.includes(userTopic)) : sorted
+  const hero = (topicCards[0] ?? sorted[0]) ?? null
+
+  const allSecondary = cards
     .filter(c => c.id !== hero?.id)
     .sort((a, b) => a.position - b.position)
+
+  const secondary = userTopic
+    ? allSecondary.filter(c => c.tags.includes(userTopic))
+    : allSecondary
+
+  const otherTopics = userTopic
+    ? allSecondary.filter(c => !c.tags.includes(userTopic))
+    : []
 
   const saved = cards.filter(c => c.is_saved)
 
@@ -73,6 +87,41 @@ export default function DigestView({ user, digest, allDigests, lastSeenAt, sourc
                       <SecondaryCard key={c.id} card={c} userId={user.id} index={i + 1} onScoreUpdate={handleScoreUpdate} onSaveToggle={handleSaveToggle} />
                     ))}
                   </div>
+                </>
+              )}
+
+              {otherTopics.length > 0 && (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '2.5rem 0 1.25rem' }}>
+                    <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+                    <button
+                      onClick={() => setShowOtherTopics(v => !v)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        background: 'none', border: '1px solid var(--border)', borderRadius: 20,
+                        padding: '0.3rem 0.85rem', cursor: 'pointer', color: 'var(--muted)',
+                        fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em',
+                        whiteSpace: 'nowrap', transition: 'border-color 0.15s, color 0.15s',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border2)'; e.currentTarget.style.color = 'var(--sub)' }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--muted)' }}
+                    >
+                      {showOtherTopics ? 'Ocultar outros tópicos' : `Ver outros tópicos (${otherTopics.length})`}
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+                        style={{ transition: 'transform 0.2s', transform: showOtherTopics ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                        <path d="M2 3.5L5 6.5L8 3.5"/>
+                      </svg>
+                    </button>
+                    <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+                  </div>
+
+                  {showOtherTopics && (
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      {otherTopics.map((c, i) => (
+                        <SecondaryCard key={c.id} card={c} userId={user.id} index={secondary.length + i + 1} onScoreUpdate={handleScoreUpdate} onSaveToggle={handleSaveToggle} />
+                      ))}
+                    </div>
+                  )}
                 </>
               )}
             </>

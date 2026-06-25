@@ -12,11 +12,12 @@ export default async function AppPage() {
   const now = new Date().toISOString()
   const { data: profile } = await supabase
     .from('profiles')
-    .select('last_seen_at')
+    .select('last_seen_at, topic')
     .eq('id', user.id)
     .maybeSingle()
 
   const lastSeenAt: string | null = profile?.last_seen_at ?? null
+  const userTopic: string | null = profile?.topic ?? null
 
   await supabase
     .from('profiles')
@@ -91,6 +92,7 @@ export default async function AppPage() {
       allDigests={allDigestsNormalized}
       lastSeenAt={lastSeenAt}
       sources={sources}
+      userTopic={userTopic}
     />
   )
 }

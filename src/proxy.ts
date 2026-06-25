@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -23,13 +23,15 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Rota protegida: redireciona para /login se não autenticado
-  if (!user && request.nextUrl.pathname.startsWith('/app')) {
+  const path = request.nextUrl.pathname
+
+  // Rotas protegidas: redireciona para /login se não autenticado
+  if (!user && (path.startsWith('/app') || path.startsWith('/onboarding'))) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
   // Já autenticado: redireciona para /app se tentar acessar /login
-  if (user && request.nextUrl.pathname === '/login') {
+  if (user && path === '/login') {
     return NextResponse.redirect(new URL('/app', request.url))
   }
 
@@ -37,5 +39,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/app/:path*', '/login'],
+  matcher: ['/app/:path*', '/onboarding', '/login'],
 }

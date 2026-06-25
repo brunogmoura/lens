@@ -3,13 +3,30 @@ import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
-  const code  = searchParams.get('code')
-  const next  = searchParams.get('next') ?? '/app'
+  const code = searchParams.get('code')
 
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) return NextResponse.redirect(`${origin}${next}`)
+
+    if (!error) {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('topic')
+          .eq('id', user.id)
+          .maybeSingle()
+
+        // Primeiro acesso ou sem tópico definido → onboarding
+        if (!profile?.topic) {
+          return NextResponse.redirect(`${origin}/onboarding`)
+        }
+      }
+
+      return NextResponse.redirect(`${origin}/app`)
+    }
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth`)

@@ -19,43 +19,157 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-      <div style={{ width: '100%', maxWidth: 380 }}>
-        {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: '0.4rem' }}>
-          <div style={{ width: 32, height: 32, background: 'var(--purple)', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="white" strokeWidth="2">
-              <circle cx="10" cy="10" r="4"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <span style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: -0.4 }}>Lens</span>
+    <main style={{ display: 'flex', minHeight: '100vh', flexWrap: 'wrap' }}>
+
+      {/* ── BRAND PANEL (esquerda) ── */}
+      <div style={{
+        flex: '1.1 1 440px',
+        background: 'var(--bg)',
+        padding: '3.5rem 4rem',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Fragmentos de texto animados */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          filter: 'blur(5px)', animation: 'scanField 11s linear infinite',
+          fontFamily: "'DM Mono', monospace", fontSize: '0.74rem',
+          letterSpacing: '0.04em', textTransform: 'uppercase',
+          color: 'var(--text)', userSelect: 'none',
+        }}>
+          {[
+            ['5%','8%','SpaceX × Cursor · $60B','5s','0s'],
+            ['52%','5%','Android 17 · MCP nativo','6s','0.4s'],
+            ['30%','14%','Claude Fable 5 bloqueado','5.5s','0.9s'],
+            ['70%','18%','GLM-5.2 · 1M tokens','6.5s','1.3s'],
+            ['10%','24%','ChatGPT Ads · $100M ARR','5.2s','1.7s'],
+            ['46%','28%','soberania de IA · G7','6.2s','2.1s'],
+            ['76%','34%','org design · Meta','5.8s','0.2s'],
+            ['18%','40%','open-source frontier','6.8s','1.1s'],
+            ['54%','46%','agentes · automação','5.4s','1.9s'],
+            ['8%','54%','75% dos BR já usam IA','6.4s','0.7s'],
+            ['60%','58%','300 mil consultores','5.6s','2.3s'],
+            ['34%','64%','GPT-Bidi-1 · voz','6.6s','1.5s'],
+            ['72%','70%','C-Suite · magic thinking','5.3s','0.5s'],
+            ['14%','76%','TLDR Tech · 07:02','6.1s','2s'],
+            ['48%','82%','AI Breakfast · wire','5.7s','1.2s'],
+            ['24%','90%','$60B · all-stock','6.3s','0.9s'],
+            ['66%','88%','1.284 sinais hoje','5.9s','1.8s'],
+          ].map(([left, top, text, dur, delay], i) => (
+            <span key={i} style={{
+              position: 'absolute', left, top, opacity: 0.20,
+              animation: `fragFloat ${dur} ease-in-out ${delay} infinite alternate`,
+            }}>{text}</span>
+          ))}
         </div>
 
-        <p style={{ fontSize: '0.78rem', color: 'var(--muted)', textAlign: 'center', marginBottom: '2rem' }}>
-          Inteligência de mercado que evolui com o seu time
-        </p>
-
-        <div style={{
-          background: 'var(--s1)', border: '1px solid var(--border2)',
-          borderRadius: 16, padding: '1.75rem',
-          boxShadow: '0 0 60px rgba(109,40,217,0.1), 0 24px 48px rgba(0,0,0,0.3)',
+        {/* Scan line */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', left: '-4%', right: '-4%', height: 140,
+          transform: 'translateY(-50%)', pointerEvents: 'none',
+          background: 'linear-gradient(180deg, transparent, rgba(227,247,148,0.16) 46%, rgba(227,247,148,0.28) 50%, rgba(227,247,148,0.16) 54%, transparent)',
+          animation: 'scanLine 11s cubic-bezier(.45,0,.55,1) infinite',
         }}>
-          <div style={{ fontSize: '0.95rem', fontWeight: 600, textAlign: 'center', marginBottom: '0.25rem' }}>
-            Entrar no Lens
-          </div>
-          <div style={{ fontSize: '0.78rem', color: 'var(--muted)', textAlign: 'center', marginBottom: '1.5rem' }}>
-            Use sua conta Google para continuar
-          </div>
+          <div style={{
+            position: 'absolute', left: 0, right: 0, top: '50%', height: 2,
+            background: 'linear-gradient(90deg, transparent, #cfe85f 20%, #e3f794 50%, #cfe85f 80%, transparent)',
+            boxShadow: '0 0 18px 3px rgba(227,247,148,0.7)',
+          }} />
+        </div>
+
+        {/* Logo */}
+        <span style={{
+          position: 'relative',
+          fontFamily: "'Newsreader', Georgia, serif",
+          fontWeight: 500, fontSize: '1.5rem', letterSpacing: '-0.01em',
+        }}>Lens</span>
+
+        {/* Headline animada */}
+        <div style={{ position: 'relative' }}>
+          <div style={{
+            fontFamily: "'DM Mono', monospace",
+            fontSize: '0.72rem', letterSpacing: '0.1em',
+            textTransform: 'uppercase', color: 'var(--muted)',
+            marginBottom: '1.5rem',
+          }}>Intelligence Briefing</div>
+          <h1 style={{
+            fontFamily: "'Newsreader', Georgia, serif",
+            fontWeight: 500,
+            fontSize: 'clamp(2.2rem, 4vw, 3rem)',
+            lineHeight: 1.14, letterSpacing: '-0.02em', margin: 0,
+            animation: 'scanHeadline 11s linear infinite',
+          }}>
+            Sinais de IA,<br />traduzidos em<br />
+            <span style={{
+              fontStyle: 'italic',
+              backgroundImage: 'linear-gradient(#e3f794, #e3f794)',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: '0 0.86em',
+              backgroundSize: '0% 0.42em',
+              WebkitBoxDecorationBreak: 'clone',
+              animation: 'scanMark 11s linear infinite',
+            }}>
+              decisões de cliente.
+            </span>
+          </h1>
+        </div>
+
+        {/* Footer label */}
+        <span style={{
+          position: 'relative',
+          fontFamily: "'DM Mono', monospace",
+          fontSize: '0.7rem', letterSpacing: '0.08em',
+          textTransform: 'uppercase', color: 'var(--muted)',
+        }}>Currently in Beta · Edição Nº 02</span>
+      </div>
+
+      {/* ── FORM PANEL (direita) ── */}
+      <div style={{
+        flex: '1 1 440px',
+        background: 'var(--s2)',
+        borderLeft: '1px solid var(--border)',
+        padding: '3.5rem 4rem',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+      }}>
+        <div style={{ width: '100%', maxWidth: 360, margin: '0 auto' }}>
+
+          <h2 style={{
+            fontFamily: "'Newsreader', Georgia, serif",
+            fontWeight: 500, fontSize: '2rem',
+            letterSpacing: '-0.015em', marginBottom: '0.5rem',
+          }}>Entrar</h2>
+          <p style={{
+            fontFamily: "'Newsreader', Georgia, serif",
+            fontSize: '1.05rem', color: 'var(--sub)', marginBottom: '2.5rem',
+          }}>Acesse a edição de hoje.</p>
 
           <button
             onClick={handleGoogle}
             disabled={loading}
             style={{
-              width: '100%', background: 'var(--s2)', border: '1px solid var(--border2)',
-              borderRadius: 8, padding: '0.65rem 1rem', color: 'var(--text)',
-              fontSize: '0.85rem', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', gap: 10, transition: 'background 0.12s',
-              opacity: loading ? 0.6 : 1,
+              width: '100%',
+              background: loading ? 'var(--border2)' : 'var(--lima)',
+              border: '1px solid var(--border)',
+              borderRadius: 2,
+              padding: '14px',
+              fontFamily: "'DM Mono', monospace",
+              fontSize: '0.78rem',
+              fontWeight: 500,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: 'var(--text)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.12s',
+              opacity: loading ? 0.7 : 1,
             }}
           >
             {!loading && (
@@ -70,9 +184,11 @@ export default function LoginPage() {
           </button>
 
           {error && (
-            <p style={{ fontSize: '0.75rem', color: '#f87171', textAlign: 'center', marginTop: '0.75rem' }}>
-              {error}
-            </p>
+            <p style={{
+              fontFamily: "'DM Mono', monospace",
+              fontSize: '0.72rem', color: '#c0392b',
+              textAlign: 'center', marginTop: '1rem',
+            }}>{error}</p>
           )}
         </div>
       </div>
