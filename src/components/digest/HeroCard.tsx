@@ -74,14 +74,47 @@ export default function HeroCard({ card, userId, onScoreUpdate, onSaveToggle }: 
           color: 'var(--muted)',
         }}>{card.source}</span>
         {card.signal && (
-          <span style={{
-            fontFamily: "'DM Mono', monospace",
-            fontSize: '0.6rem', fontWeight: 500,
-            letterSpacing: '0.08em', textTransform: 'uppercase',
-            color: 'var(--text)',
-            background: 'var(--lima)',
-            borderRadius: 2, padding: '2px 7px',
-          }}>Sinal</span>
+          <span style={{ position: 'relative', display: 'inline-flex' }}
+            onMouseEnter={e => { const t = e.currentTarget.querySelector<HTMLElement>('.sinal-tip'); if (t) t.style.opacity = '1' }}
+            onMouseLeave={e => { const t = e.currentTarget.querySelector<HTMLElement>('.sinal-tip'); if (t) t.style.opacity = '0' }}
+          >
+            <span style={{
+              fontFamily: "'DM Mono', monospace",
+              fontSize: '0.6rem', fontWeight: 500,
+              letterSpacing: '0.08em', textTransform: 'uppercase',
+              color: 'var(--text)',
+              background: 'var(--lima)',
+              borderRadius: 2, padding: '2px 7px',
+              cursor: 'default',
+            }}>Sinal</span>
+            <span className="sinal-tip" style={{
+              position: 'absolute',
+              bottom: 'calc(100% + 7px)',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: 'var(--border)',
+              color: 'white',
+              fontFamily: "'DM Mono', monospace",
+              fontSize: '0.58rem',
+              letterSpacing: '0.04em',
+              lineHeight: 1.5,
+              padding: '6px 10px',
+              borderRadius: 2,
+              whiteSpace: 'nowrap',
+              pointerEvents: 'none',
+              opacity: 0,
+              transition: 'opacity 0.15s',
+              zIndex: 50,
+            }}>
+              Algo está se movendo aqui — vale atenção antes da próxima conversa com cliente
+              <span style={{
+                position: 'absolute', top: '100%', left: '50%',
+                transform: 'translateX(-50%)',
+                borderWidth: 5, borderStyle: 'solid',
+                borderColor: 'var(--border) transparent transparent transparent',
+              }} />
+            </span>
+          </span>
         )}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
           {card.tags.slice(0, 2).map(t => (
