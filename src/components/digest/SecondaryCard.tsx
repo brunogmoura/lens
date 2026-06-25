@@ -4,6 +4,28 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { DigestCard, CardSource } from '@/types'
 
+const HORIZON_COLOR: Record<string, { bg: string; label: string }> = {
+  'curto prazo':  { bg: '#5a8a3a', label: 'Curto prazo' },
+  'médio prazo':  { bg: '#c4872a', label: 'Médio prazo' },
+  'longo prazo':  { bg: '#b4b2a9', label: 'Longo prazo' },
+}
+
+function HorizonDot({ horizon }: { horizon: string }) {
+  const match = HORIZON_COLOR[horizon.toLowerCase()] ?? { bg: 'var(--border2)', label: horizon }
+  return (
+    <span
+      title={match.label}
+      style={{
+        width: 7, height: 7,
+        borderRadius: '50%',
+        background: match.bg,
+        flexShrink: 0,
+        display: 'inline-block',
+      }}
+    />
+  )
+}
+
 type Props = {
   card: DigestCard
   userId: string
@@ -70,6 +92,9 @@ export default function SecondaryCard({ card, userId, index, onScoreUpdate, onSa
               borderRadius: 2, padding: '1px 6px',
             }}>Sinal</span>
           )}
+          {card.horizon && (
+            <HorizonDot horizon={card.horizon} />
+          )}
           <button
             onClick={handleSave}
             title={card.is_saved ? 'Remover' : 'Salvar'}
@@ -101,7 +126,7 @@ export default function SecondaryCard({ card, userId, index, onScoreUpdate, onSa
           fontFamily: "'Newsreader', Georgia, serif",
           fontSize: '0.9rem', color: 'var(--sub)', lineHeight: 1.65,
         }}>
-          {expanded ? card.summary : card.summary.slice(0, 110) + (card.summary.length > 110 ? '…' : '')}
+          {expanded ? card.summary : card.summary.slice(0, 180) + (card.summary.length > 180 ? '…' : '')}
         </p>
 
         {expanded && (

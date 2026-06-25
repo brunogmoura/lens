@@ -17,14 +17,21 @@ type Props = {
   lastSeenAt: string | null
   sources: Source[]
   userTopic: string | null
+  onTopicChange?: (topic: string) => void
 }
 
 type Tab = 'digest' | 'saved' | 'history'
 
-export default function DigestView({ user, digest, allDigests, lastSeenAt, sources, userTopic }: Props) {
+export default function DigestView({ user, digest, allDigests, lastSeenAt, sources, userTopic: initialTopic, onTopicChange }: Props) {
   const [cards, setCards] = useState<DigestCard[]>(digest?.cards ?? [])
   const [tab, setTab] = useState<Tab>('digest')
   const [showOtherTopics, setShowOtherTopics] = useState(false)
+  const [userTopic, setUserTopic] = useState(initialTopic)
+
+  function handleTopicChange(topic: string) {
+    setUserTopic(topic)
+    onTopicChange?.(topic)
+  }
 
   function handleScoreUpdate(cardId: string, score: number) {
     setCards(prev => prev.map(c => c.id === cardId ? { ...c, user_score: score } : c))
@@ -56,7 +63,7 @@ export default function DigestView({ user, digest, allDigests, lastSeenAt, sourc
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
-      <NavBar userName={user.name} tab={tab} onTabChange={setTab} savedCount={saved.length} />
+      <NavBar userName={user.name} userId={user.id} tab={tab} onTabChange={setTab} savedCount={saved.length} userTopic={userTopic} onTopicChange={handleTopicChange} />
 
       <main style={{ flex: 1, maxWidth: 780, width: '100%', margin: '0 auto', padding: '2rem 1.25rem 4rem' }}>
         {tab === 'digest' && (
